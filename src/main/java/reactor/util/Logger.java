@@ -29,6 +29,34 @@ public interface Logger {
 	String getName();
 
 	/**
+	 * Return true if the requested {@link Level} is enabled for this {@link Logger}.
+	 * Only INFO, WARNING, SEVERE, FINE and FINEST are taken into account, as these
+	 * are the one mapped to every backing implementation (and having a corresponding
+	 * check method like {@link #isTraceEnabled()}).
+	 *
+	 * @param level the {@link Level} to check
+	 * @return true if that level of logging is enabled.
+	 */
+	default boolean isLevelEnabled(Level level) {
+		if (level == Level.INFO) {
+			return isInfoEnabled();
+		}
+		if (level == Level.WARNING) {
+			return isWarnEnabled();
+		}
+		if (level == Level.SEVERE) {
+			return isErrorEnabled();
+		}
+		if (level == Level.FINE) {
+			return isDebugEnabled();
+		}
+		if (level == Level.FINEST) {
+			return isTraceEnabled();
+		}
+		return false;
+	}
+
+	/**
 	 * Is the logger instance enabled for the TRACE level?
 	 *
 	 * @return True if this Logger is enabled for the TRACE level,
