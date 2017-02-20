@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 import java.util.function.Consumer;
 
-import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Loopback;
@@ -41,12 +40,12 @@ final class FluxOnBackpressureDrop<T> extends FluxSource<T, T> {
 
 	final Consumer<? super T> onDrop;
 
-	public FluxOnBackpressureDrop(Publisher<? extends T> source) {
+	FluxOnBackpressureDrop(Flux<? extends T> source) {
 		super(source);
 		this.onDrop = NOOP;
 	}
 
-	public FluxOnBackpressureDrop(Publisher<? extends T> source,
+	FluxOnBackpressureDrop(Flux<? extends T> source,
 			Consumer<? super T> onDrop) {
 		super(source);
 		this.onDrop = Objects.requireNonNull(onDrop, "onDrop");

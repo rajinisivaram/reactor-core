@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ final class FluxSampleTimeout<T, U> extends FluxSource<T, T> {
 
 	final Supplier<Queue<Object>> queueSupplier;
 
-	FluxSampleTimeout(Publisher<? extends T> source,
+	FluxSampleTimeout(Flux<? extends T> source,
 			Function<? super T, ? extends Publisher<U>> throttler,
 			Supplier<Queue<Object>> queueSupplier) {
 		super(source);

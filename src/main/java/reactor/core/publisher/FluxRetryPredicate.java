@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ final class FluxRetryPredicate<T> extends FluxSource<T, T> {
 
 	final Predicate<Throwable> predicate;
 
-	public FluxRetryPredicate(Publisher<? extends T> source, Predicate<Throwable> predicate) {
+	FluxRetryPredicate(Flux<? extends T> source, Predicate<Throwable> predicate) {
 		super(source);
 		this.predicate = Objects.requireNonNull(predicate, "predicate");
 	}
@@ -64,7 +64,7 @@ final class FluxRetryPredicate<T> extends FluxSource<T, T> {
 
 		long produced;
 
-		public RetryPredicateSubscriber(Publisher<? extends T> source, 
+		RetryPredicateSubscriber(Publisher<? extends T> source,
 				Subscriber<? super T> actual, Predicate<Throwable> predicate) {
 			super(actual);
 			this.source = source;

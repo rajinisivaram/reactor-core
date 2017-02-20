@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,6 @@ import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
 import reactor.core.Fuseable;
 import reactor.core.Receiver;
-import reactor.util.Logger;
-import reactor.util.Loggers;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
 
@@ -62,7 +60,7 @@ final class FluxOnAssembly<T> extends FluxSource<T, T> implements Fuseable, Asse
 	/**
 	 * Create an assembly trace decorated as a {@link Flux}.
 	 */
-	FluxOnAssembly(Publisher<? extends T> source) {
+	FluxOnAssembly(Flux<? extends T> source) {
 		super(source);
 		this.snapshotStack = new AssemblySnapshotException();
 	}
@@ -71,7 +69,7 @@ final class FluxOnAssembly<T> extends FluxSource<T, T> implements Fuseable, Asse
 	 * Create an assembly trace augmented with a custom description (eg. a name for a Flux
 	 * or a wider correlation ID) and exposed as a {@link Flux}.
 	 */
-	FluxOnAssembly(Publisher<? extends T> source, String description) {
+	FluxOnAssembly(Flux<? extends T> source, String description) {
 		super(source);
 		this.snapshotStack = new AssemblySnapshotException(description);
 	}

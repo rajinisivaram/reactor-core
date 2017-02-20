@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import reactor.core.Receiver;
  */
 final class MonoIgnoreEmpty<T> extends MonoSource<T, T> {
 
-	public MonoIgnoreEmpty(Publisher<? extends T> source) {
+	MonoIgnoreEmpty(Publisher<? extends T> source) {
 		super(source);
 	}
 
@@ -44,7 +44,7 @@ final class MonoIgnoreEmpty<T> extends MonoSource<T, T> {
 
 		Subscription s;
 
-		public IgnoreElementsSubscriber(Subscriber<? super T> actual) {
+		IgnoreElementsSubscriber(Subscriber<? super T> actual) {
 			this.actual = actual;
 		}
 

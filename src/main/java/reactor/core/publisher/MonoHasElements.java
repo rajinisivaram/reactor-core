@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import reactor.core.Receiver;
  */
 final class MonoHasElements<T> extends MonoSource<T, Boolean> implements Fuseable {
 
-	public MonoHasElements(Publisher<? extends T> source) {
+	MonoHasElements(Publisher<? extends T> source) {
 		super(source);
 	}
 
@@ -39,7 +39,7 @@ final class MonoHasElements<T> extends MonoSource<T, Boolean> implements Fuseabl
 			implements Receiver {
 		Subscription s;
 
-		public HasElementsSubscriber(Subscriber<? super Boolean> actual) {
+		HasElementsSubscriber(Subscriber<? super Boolean> actual) {
 			super(actual);
 		}
 

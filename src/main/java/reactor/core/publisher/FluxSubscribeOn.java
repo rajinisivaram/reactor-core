@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package reactor.core.publisher;
 
 import java.util.Objects;
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
@@ -41,7 +40,7 @@ final class FluxSubscribeOn<T> extends FluxSource<T, T> implements Loopback {
 	final Scheduler scheduler;
 	
 	FluxSubscribeOn(
-			Publisher<? extends T> source, 
+			Flux<? extends T> source,
 			Scheduler scheduler) {
 		super(source);
 		this.scheduler = Objects.requireNonNull(scheduler, "scheduler");

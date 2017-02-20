@@ -199,13 +199,13 @@ public abstract class Hooks {
 			}
 			if (publisher instanceof Mono) {
 				if (publisher instanceof Fuseable) {
-					return new OperatorHook<>(new MonoPeekFuseable<>(publisher,
+					return new OperatorHook<>(new MonoPeekFuseable<>((Mono)publisher,
 							onSubscribeCall, onNextCall, onErrorCall, onCompleteCall,
 							onAfterTerminateCall, onRequestCall, onCancelCall),
 							traced, tracedCategory, tracedLevel, tracedSignals);
 				}
 				else {
-					return new OperatorHook<>(new MonoPeek<>(publisher,
+					return new OperatorHook<>(new MonoPeek<>((Mono)publisher,
 							onSubscribeCall, onNextCall, onErrorCall, onCompleteCall,
 							onAfterTerminateCall, onRequestCall, onCancelCall), traced
 							, tracedCategory, tracedLevel, tracedSignals);
@@ -221,13 +221,13 @@ public abstract class Hooks {
 						, tracedCategory, tracedLevel, tracedSignals);
 			}
 			else if (publisher instanceof Fuseable) {
-				return new OperatorHook<>(new FluxPeekFuseable<>(publisher,
+				return new OperatorHook<>(new FluxPeekFuseable<>((Flux<T>)publisher,
 						onSubscribeCall, onNextCall, onErrorCall, onCompleteCall,
 						onAfterTerminateCall, onRequestCall, onCancelCall), traced
 						, tracedCategory, tracedLevel, tracedSignals);
 			}
 			else {
-				return new OperatorHook<>(new FluxPeek<>(publisher,
+				return new OperatorHook<>(new FluxPeek<>((Flux<T>)publisher,
 						onSubscribeCall, onNextCall, onErrorCall, onCompleteCall,
 						onAfterTerminateCall, onRequestCall, onCancelCall), traced
 						, tracedCategory, tracedLevel, tracedSignals);
@@ -538,17 +538,17 @@ public abstract class Hooks {
 					if (trace){
 						if (publisher instanceof Callable) {
 							if (publisher instanceof Mono) {
-								return new MonoCallableOnAssembly<>(publisher);
+								return new MonoCallableOnAssembly<>((Mono<T>)publisher);
 							}
-							return new FluxCallableOnAssembly<>(publisher);
+							return new FluxCallableOnAssembly<>((Flux<T>)publisher);
 						}
 						if (publisher instanceof Mono) {
-							return new MonoOnAssembly<>(publisher);
+							return new MonoOnAssembly<>((Mono<T>)publisher);
 						}
 						if (publisher instanceof ParallelFlux){
 							return new ParallelFluxOnAssembly<>((ParallelFlux<T>) publisher);
 						}
-						return new FluxOnAssembly<>(publisher);
+						return new FluxOnAssembly<>((Flux<T>)publisher);
 					}
 					return publisher;
 				}

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -133,7 +133,7 @@ public class MonoDelayElementTest {
 
 		try {
 			StepVerifier.withVirtualTime(() ->
-					new MonoDelayElement<>(source, 2, TimeUnit.SECONDS, Schedulers.timer()))
+					new MonoDelayElement<>(source.mono(), 2, TimeUnit.SECONDS, Schedulers.timer()))
 			            .expectSubscription()
 			            .then(() -> source.next("foo").error(new IllegalStateException("boom")))
 			            .expectNoEvent(Duration.ofSeconds(2))
@@ -249,7 +249,7 @@ public class MonoDelayElementTest {
 		AtomicReference<Object> dropped = new AtomicReference<>();
 		Hooks.onNextDropped(dropped::set);
 
-		Flux<String> source = Flux.from(s -> {
+		Mono<String> source = MonoSource.wrap(s -> {
 			s.onSubscribe(Operators.emptySubscription());
 			s.onNext("foo");
 			s.onNext("bar");
@@ -274,7 +274,7 @@ public class MonoDelayElementTest {
 
 	@Test
 	public void guardedAgainstOnComplete() {
-		Flux<String> source = Flux.from(s -> {
+		Mono<String> source = MonoSource.wrap(s -> {
 			s.onSubscribe(Operators.emptySubscription());
 			s.onNext("foo");
 			s.onComplete();
@@ -295,7 +295,7 @@ public class MonoDelayElementTest {
 		AtomicReference<Throwable> dropped = new AtomicReference<>();
 		Hooks.onErrorDropped(dropped::set);
 
-		Flux<String> source = Flux.from(s -> {
+		Mono<String> source = MonoSource.wrap(s -> {
 			s.onSubscribe(Operators.emptySubscription());
 			s.onNext("foo");
 			s.onError(new IllegalStateException("boom"));
@@ -321,7 +321,7 @@ public class MonoDelayElementTest {
 	@Test
 	public void upstreamIsDelayedSource() {
 		AtomicReference<Object> upstream = new AtomicReference<>();
-		Flux<Integer> source = Flux.range(1, 5);
+		Mono<Integer> source = MonoSource.wrap(Flux.range(1, 5));
 
 
 		StepVerifier.withVirtualTime(() -> new MonoDelayElement<>(source, 2, TimeUnit.SECONDS, Schedulers.timer())

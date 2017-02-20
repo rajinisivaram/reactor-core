@@ -18,23 +18,16 @@ package reactor.core.publisher;
 import org.reactivestreams.Subscriber;
 
 /**
- * Wraps another Publisher/Mono and hides its identity, including its
- * Subscription.
- * 
- * <p>
- * @see <a href="https://github.com/reactor/reactive-streams-commons">Reactive-Streams-Commons</a>
- * 
- * @param <T> the value type
- * 
+ * @author Stephane Maldini
  */
-final class MonoHide<T> extends MonoSource<T, T> {
+final class MonoMaterialize<T> extends MonoSource<T, Signal<T>> {
 
-    MonoHide(Mono<? extends T> source) {
-        super(source);
-    }
-    
-    @Override
-    public void subscribe(Subscriber<? super T> s) {
-        source.subscribe(new FluxHide.HideSubscriber<>(s));
-    }
+	MonoMaterialize(Mono<T> source) {
+		super(source);
+	}
+
+	@Override
+	public void subscribe(Subscriber<? super Signal<T>> subscriber) {
+		source.subscribe(new FluxMaterialize.MaterializeSubscriber<>(subscriber));
+	}
 }

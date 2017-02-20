@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package reactor.core.publisher;
 
 import java.util.Objects;
 
-import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Fuseable;
@@ -33,7 +32,7 @@ final class FluxDefaultIfEmpty<T> extends FluxSource<T, T> {
 
 	final T value;
 
-	public FluxDefaultIfEmpty(Publisher<? extends T> source, T value) {
+	FluxDefaultIfEmpty(Flux<? extends T> source, T value) {
 		super(source);
 		this.value = Objects.requireNonNull(value, "value");
 	}
@@ -51,7 +50,7 @@ final class FluxDefaultIfEmpty<T> extends FluxSource<T, T> {
 
 		boolean hasValue;
 
-		public DefaultIfEmptySubscriber(Subscriber<? super T> actual, T value) {
+		DefaultIfEmptySubscriber(Subscriber<? super T> actual, T value) {
 			super(actual);
 			this.value = value;
 		}

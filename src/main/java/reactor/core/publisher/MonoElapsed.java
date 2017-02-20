@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package reactor.core.publisher;
 
-import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import reactor.core.Fuseable;
 import reactor.core.scheduler.TimedScheduler;
@@ -29,7 +28,7 @@ final class MonoElapsed<T> extends MonoSource<T, Tuple2<Long, T>> implements Fus
 
 	final TimedScheduler scheduler;
 
-	MonoElapsed(Publisher<T> source, TimedScheduler scheduler) {
+	MonoElapsed(Mono<T> source, TimedScheduler scheduler) {
 		super(source);
 		this.scheduler = scheduler;
 	}

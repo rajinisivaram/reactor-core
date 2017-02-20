@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,7 +19,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
@@ -58,7 +57,7 @@ final class FluxPeekStateful<T, S> extends FluxSource<T, T> implements SignalPee
 
 	final Consumer<S> onCancelCall;
 
-	public FluxPeekStateful(Publisher<? extends T> source,
+	FluxPeekStateful(Flux<? extends T> source,
 			Supplier<S> stateSeeder,
 			BiConsumer<? super Subscription, S> onSubscribeCall,
 			BiConsumer<? super T, S> onNextCall,
@@ -97,7 +96,7 @@ final class FluxPeekStateful<T, S> extends FluxSource<T, T> implements SignalPee
 
 		boolean done;
 
-		public PeekStatefulSubscriber(Subscriber<? super T> actual,
+		PeekStatefulSubscriber(Subscriber<? super T> actual,
 				SignalPeekStateful<T, S> parent, S state) {
 			this.actual = actual;
 			this.parent = parent;

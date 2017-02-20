@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,12 @@ import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import reactor.core.*;
+import reactor.core.Disposable;
+import reactor.core.Exceptions;
+import reactor.core.MultiReceiver;
+import reactor.core.Producer;
+import reactor.core.Receiver;
+import reactor.core.Trackable;
 import reactor.util.concurrent.OpenHashSet;
 
 /**
@@ -68,7 +73,7 @@ final class FluxGroupJoin<TLeft, TRight, TLeftEnd, TRightEnd, R>
 	final Supplier<? extends Queue<Object>> queueSupplier;
 	final Supplier<? extends Queue<TRight>> processorQueueSupplier;
 
-	public FluxGroupJoin(Publisher<TLeft> source,
+	FluxGroupJoin(Flux<TLeft> source,
 			Publisher<? extends TRight> other,
 			Function<? super TLeft, ? extends Publisher<TLeftEnd>> leftEnd,
 			Function<? super TRight, ? extends Publisher<TRightEnd>> rightEnd,

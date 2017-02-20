@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ final class FluxRetryWhen<T> extends FluxSource<T, T> {
 
 	final Function<? super Flux<Throwable>, ? extends Publisher<?>> whenSourceFactory;
 
-	public FluxRetryWhen(Publisher<? extends T> source,
+	FluxRetryWhen(Flux<? extends T> source,
 							  Function<? super Flux<Throwable>, ? extends Publisher<?>> whenSourceFactory) {
 		super(source);
 		this.whenSourceFactory = Objects.requireNonNull(whenSourceFactory, "whenSourceFactory");
@@ -102,7 +102,7 @@ final class FluxRetryWhen<T> extends FluxSource<T, T> {
 
 		long produced;
 		
-		public RetryWhenMainSubscriber(Subscriber<? super T> actual, Subscriber<Throwable> signaller,
+		RetryWhenMainSubscriber(Subscriber<? super T> actual, Subscriber<Throwable> signaller,
 												Publisher<? extends T> source) {
 			super(actual);
 			this.signaller = signaller;

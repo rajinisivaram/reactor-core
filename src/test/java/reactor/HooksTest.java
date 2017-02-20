@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -155,10 +155,10 @@ public class HooksTest {
 		simpleFlux();
 
 		Assert.assertArrayEquals(q.toArray(),
-				new String[]{"FluxJust: 1", "{ operator : \"MapFuseable\" }: 2",
-						"{ operator : \"PeekFuseable\" }! false",
-						"{ operator : \"CollectList\" }! true", "MonoJust: [2]",
-						"{ operator : \"Otherwise\" }: [2]"});
+				new String[]{"FluxJust: 1", "{ \"operator\" : \"MapFuseable\" }: 2",
+						"{ \"operator\" : \"PeekFuseable\" }! false",
+						"{ \"operator\" : \"CollectList\" }! true", "MonoJust: [2]",
+						"{ \"operator\" : \"Otherwise\" }: [2]"});
 
 		q.clear();
 
@@ -172,10 +172,10 @@ public class HooksTest {
 		simpleFlux();
 
 		Assert.assertArrayEquals(q.toArray(),
-				new String[]{"FluxJust: 1", "{ operator : \"MapFuseable\" }: 2",
-						"{ operator : \"PeekFuseable\" }! false",
-						"{ operator : \"CollectList\" }! false", "MonoJust: [2]",
-						"{ operator : \"Otherwise\" }: [2]"});
+				new String[]{"FluxJust: 1", "{ \"operator\" : \"MapFuseable\" }: 2",
+						"{ \"operator\" : \"PeekFuseable\" }! false",
+						"{ \"operator\" : \"CollectList\" }! false", "MonoJust: [2]",
+						"{ \"operator\" : \"Otherwise\" }: [2]"});
 
 		q.clear();
 

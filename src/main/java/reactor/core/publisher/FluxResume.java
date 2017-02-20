@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ final class FluxResume<T> extends FluxSource<T, T> {
 
 	final Function<? super Throwable, ? extends Publisher<? extends T>> nextFactory;
 
-	public FluxResume(Publisher<? extends T> source,
+	FluxResume(Flux<? extends T> source,
 			Function<? super Throwable, ? extends Publisher<? extends T>> nextFactory) {
 		super(source);
 		this.nextFactory = Objects.requireNonNull(nextFactory, "nextFactory");

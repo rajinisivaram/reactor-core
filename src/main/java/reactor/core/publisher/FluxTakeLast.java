@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import java.util.ArrayDeque;
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 import java.util.function.BooleanSupplier;
 
-import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Producer;
@@ -36,7 +35,7 @@ final class FluxTakeLast<T> extends FluxSource<T, T> {
 
 	final int n;
 
-	FluxTakeLast(Publisher<? extends T> source, int n) {
+	FluxTakeLast(Flux<? extends T> source, int n) {
 		super(source);
 		if (n < 0) {
 			throw new IllegalArgumentException("n >= required but it was " + n);

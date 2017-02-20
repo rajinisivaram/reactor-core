@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,7 +21,6 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 import java.util.function.Consumer;
 
-import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
@@ -44,7 +43,7 @@ final class FluxOnBackpressureBufferStrategy<O> extends FluxSource<O, O> {
 	final boolean                delayError;
 	final BufferOverflowStrategy bufferOverflowStrategy;
 
-	public FluxOnBackpressureBufferStrategy(Publisher<? extends O> source,
+	FluxOnBackpressureBufferStrategy(Flux<? extends O> source,
 			int bufferSize,
 			Consumer<? super O> onBufferOverflow,
 			BufferOverflowStrategy bufferOverflowStrategy) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.scheduler.TimedScheduler;
@@ -32,7 +31,7 @@ final class FluxBufferTimeOrSize<T, C extends Collection<? super T>> extends Flu
 
 	final Supplier<C> bufferSupplier;
 
-	public FluxBufferTimeOrSize(Publisher<T> source,
+	FluxBufferTimeOrSize(Flux<T> source,
 			int maxSize,
 			long timespan,
 			TimedScheduler timer,

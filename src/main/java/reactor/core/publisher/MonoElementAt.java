@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package reactor.core.publisher;
 
 import java.util.Objects;
 
-import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Fuseable;
@@ -36,7 +35,7 @@ final class MonoElementAt<T> extends MonoSource<T, T> implements Fuseable {
 
 	final T defaultValue;
 
-	public MonoElementAt(Publisher<? extends T> source, long index) {
+	MonoElementAt(Flux<? extends T> source, long index) {
 		super(source);
 		if (index < 0) {
 			throw new IndexOutOfBoundsException("index >= required but it was " + index);
@@ -45,7 +44,7 @@ final class MonoElementAt<T> extends MonoSource<T, T> implements Fuseable {
 		this.defaultValue = null;
 	}
 
-	public MonoElementAt(Publisher<? extends T> source, long index, T defaultValue) {
+	MonoElementAt(Flux<? extends T> source, long index, T defaultValue) {
 		super(source);
 		if (index < 0) {
 			throw new IndexOutOfBoundsException("index >= required but it was " + index);

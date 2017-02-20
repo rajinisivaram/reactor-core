@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
@@ -47,13 +46,13 @@ import reactor.core.Trackable;
  */
 final class BlockingIterable<T> implements Iterable<T>, Receiver, Trackable {
 
-	final Publisher<? extends T> source;
+	final Flux<? extends T> source;
 
 	final long batchSize;
 
 	final Supplier<Queue<T>> queueSupplier;
 
-	BlockingIterable(Publisher<? extends T> source,
+	BlockingIterable(Flux<? extends T> source,
 			long batchSize,
 			Supplier<Queue<T>> queueSupplier) {
 		if (batchSize <= 0) {

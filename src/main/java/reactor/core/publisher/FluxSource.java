@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,13 +45,28 @@ public class FluxSource<I, O> extends Flux<O> implements Receiver {
 		}
 		return new FluxSource<>(source);
 	}
-	
+
+	/**
+	 * Build a {@link FluxSource} wrapper around the passed parent {@link Publisher}
+	 *
+	 * @param source the {@link Publisher} to decorate
+	 */
 	protected FluxSource(Publisher<? extends I> source) {
 		this.source = Objects.requireNonNull(source);
 	}
 
 	/**
-	 * Default is delegating and decorating with {@link Flux} API
+	 * Build a {@link FluxSource} wrapper around the passed parent {@link Flux}
+	 *
+	 * @param source the {@link Publisher} to decorate
+	 */
+	protected FluxSource(Flux<? extends I> source) {
+		this.source = Objects.requireNonNull(source);
+	}
+
+	/**
+	 * Default is simply delegating and decorating with {@link Flux} API. Note this
+	 * assumes an identity between input and output types.
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
@@ -61,10 +76,16 @@ public class FluxSource<I, O> extends Flux<O> implements Receiver {
 
 	@Override
 	public String toString() {
-		return "{" +
-				" operator : \"" + getClass().getSimpleName().replaceAll("Flux","") + "\"" +
-				" " +
-				'}';
+		StringBuilder sb = new StringBuilder();
+		return sb.append('{')
+		         .append(" \"operator\" : ")
+		         .append('"')
+		         .append(getClass().getSimpleName()
+		                           .replaceAll("Flux", ""))
+		         .append('"')
+		         .append(' ')
+		         .append('}')
+		         .toString();
 	}
 
 	@Override

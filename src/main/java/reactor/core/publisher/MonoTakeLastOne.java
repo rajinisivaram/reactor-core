@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package reactor.core.publisher;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Fuseable;
@@ -33,12 +32,12 @@ final class MonoTakeLastOne<T> extends MonoSource<T, T> implements Fuseable {
 
 	final T defaultValue;
 
-    public MonoTakeLastOne(Publisher<? extends T> source) {
+    MonoTakeLastOne(Flux<? extends T> source) {
         super(source);
 	    this.defaultValue = null;
     }
 
-	public MonoTakeLastOne(Publisher<? extends T> source, T defaultValue) {
+	MonoTakeLastOne(Flux<? extends T> source, T defaultValue) {
 		super(source);
 		this.defaultValue = Objects.requireNonNull(defaultValue, "defaultValue");
 	}

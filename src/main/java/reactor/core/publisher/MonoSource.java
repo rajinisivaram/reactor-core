@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,12 +52,36 @@ public class MonoSource<I, O> extends Mono<O> implements Receiver{
 		return new MonoSource<>(source);
 	}
 
+	/**
+	 * Build a {@link MonoSource} wrapper around the passed parent {@link Publisher}
+	 *
+	 * @param source the {@link Publisher} to decorate
+	 */
 	protected MonoSource(Publisher<? extends I> source) {
 		this.source = Objects.requireNonNull(source);
 	}
 
 	/**
-	 * Default is delegating and decorating with Mono API
+	 * Build a {@link MonoSource} wrapper around the passed parent {@link Mono}
+	 *
+	 * @param source the {@link Publisher} to decorate
+	 */
+	protected MonoSource(Mono<? extends I> source) {
+		this.source = Objects.requireNonNull(source);
+	}
+
+	/**
+	 * Build a {@link MonoSource} wrapper around the passed parent {@link Flux}
+	 *
+	 * @param source the {@link Publisher} to decorate
+	 */
+	protected MonoSource(Flux<? extends I> source) {
+		this.source = Objects.requireNonNull(source);
+	}
+
+	/**
+	 * Default is simply delegating and decorating with {@link Mono} API. Note this
+	 * assumes an identity between input and output types.
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
@@ -67,10 +91,16 @@ public class MonoSource<I, O> extends Mono<O> implements Receiver{
 
 	@Override
 	public String toString() {
-		return "{" +
-				" operator : \"" + getClass().getSimpleName().replaceAll("Mono","") +
-				"\" " +
-				'}';
+		StringBuilder sb = new StringBuilder();
+		return sb.append('{')
+		         .append(" \"operator\" : ")
+		         .append('"')
+		         .append(getClass().getSimpleName()
+		                           .replaceAll("Mono", ""))
+		         .append('"')
+		         .append(' ')
+		         .append('}')
+		         .toString();
 	}
 
 	@Override

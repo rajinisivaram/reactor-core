@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ final class FluxBufferStartEnd<T, U, V, C extends Collection<? super T>>
 
 	final Supplier<? extends Queue<C>> queueSupplier;
 
-	FluxBufferStartEnd(Publisher<? extends T> source,
+	FluxBufferStartEnd(Flux<? extends T> source,
 			Publisher<U> start,
 			Function<? super U, ? extends Publisher<V>> end,
 			Supplier<C> bufferSupplier,

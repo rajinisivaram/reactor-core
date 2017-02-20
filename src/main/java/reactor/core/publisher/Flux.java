@@ -1613,7 +1613,7 @@ public abstract class Flux<T> implements Publisher<T> {
 			Publisher<?>> sources,
 			final Function<? super TUPLE, ? extends V> combinator) {
 
-		return onAssembly(new FluxBuffer<>(sources, Integer.MAX_VALUE, listSupplier())
+		return onAssembly(new FluxBuffer<>(from(sources), Integer.MAX_VALUE, listSupplier())
 		                    .flatMap(new Function<List<? extends Publisher<?>>, Publisher<V>>() {
 			                    @Override
 			                    public Publisher<V> apply(List<? extends Publisher<?>> publishers) {
@@ -7208,7 +7208,7 @@ public abstract class Flux<T> implements Publisher<T> {
 	}
 
 	@SuppressWarnings("unchecked")
-	static <T> Flux<T> doOnSignal(Publisher<T> source,
+	static <T> Flux<T> doOnSignal(Flux<T> source,
 			Consumer<? super Subscription> onSubscribe,
 			Consumer<? super T> onNext,
 			Consumer<? super Throwable> onError,
@@ -7240,7 +7240,7 @@ public abstract class Flux<T> implements Publisher<T> {
 	 * Peek into a sequence signals while passing around a per-subscriber
 	 * state object initialized by {@code stateSeeder} to the various callbacks
 	 */
-	static <T,S> Flux<T> doOnSignalStateful(Publisher<T> source,
+	static <T,S> Flux<T> doOnSignalStateful(Flux<T> source,
 			Supplier<S> stateSeeder,
 			BiConsumer<? super Subscription, S> onSubscribe,
 			BiConsumer<? super T, S> onNext,

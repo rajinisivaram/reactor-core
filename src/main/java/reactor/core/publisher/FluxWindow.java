@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 import java.util.function.Supplier;
 
 import org.reactivestreams.Processor;
-import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Disposable;
@@ -53,7 +52,7 @@ final class FluxWindow<T> extends FluxSource<T, Flux<T>> {
 
 	final Supplier<? extends Queue<UnicastProcessor<T>>> overflowQueueSupplier;
 
-	FluxWindow(Publisher<? extends T> source,
+	FluxWindow(Flux<? extends T> source,
 			int size,
 			Supplier<? extends Queue<T>> processorQueueSupplier) {
 		super(source);
@@ -67,7 +66,7 @@ final class FluxWindow<T> extends FluxSource<T, Flux<T>> {
 		this.overflowQueueSupplier = null; // won't be needed here
 	}
 
-	FluxWindow(Publisher<? extends T> source,
+	FluxWindow(Flux<? extends T> source,
 			int size,
 			int skip,
 			Supplier<? extends Queue<T>> processorQueueSupplier,

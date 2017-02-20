@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
-import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Producer;
@@ -42,7 +41,7 @@ final class FluxZipIterable<T, U, R> extends FluxSource<T, R> {
 
 	final BiFunction<? super T, ? super U, ? extends R> zipper;
 
-	FluxZipIterable(Publisher<? extends T> source,
+	FluxZipIterable(Flux<? extends T> source,
 			Iterable<? extends U> other,
 			BiFunction<? super T, ? super U, ? extends R> zipper) {
 		super(source);

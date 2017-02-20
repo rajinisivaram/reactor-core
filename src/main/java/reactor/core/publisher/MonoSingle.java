@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package reactor.core.publisher;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Fuseable;
@@ -38,13 +37,13 @@ final class MonoSingle<T> extends MonoSource<T, T> implements Fuseable {
 	final T       defaultValue;
 	final boolean completeOnEmpty;
 
-	public MonoSingle(Publisher<? extends T> source) {
+	MonoSingle(Flux<? extends T> source) {
 		super(source);
 		this.defaultValue = null;
 		this.completeOnEmpty = false;
 	}
 
-	public MonoSingle(Publisher<? extends T> source,
+	MonoSingle(Flux<? extends T> source,
 			T defaultValue,
 			boolean completeOnEmpty) {
 		super(source);

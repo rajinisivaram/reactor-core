@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ final class FluxWindowBoundary<T, U> extends FluxSource<T, Flux<T>> {
 
 	final Supplier<? extends Queue<Object>> drainQueueSupplier;
 
-	FluxWindowBoundary(Publisher<? extends T> source, Publisher<U> other,
+	FluxWindowBoundary(Flux<? extends T> source, Publisher<U> other,
 			Supplier<? extends Queue<T>> processorQueueSupplier,
 			Supplier<? extends Queue<Object>> drainQueueSupplier) {
 		super(source);

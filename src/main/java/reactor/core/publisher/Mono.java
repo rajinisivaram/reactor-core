@@ -1521,16 +1521,17 @@ public abstract class Mono<T> implements Publisher<T> {
 		return onAssembly(new MonoPeekTerminal<>(this, null, null, afterTerminate));
 	}
 
+	/**
+	 *
+	 * @param onFinally
+	 * @return
+	 */
 	public final Mono<T> doFinally(Consumer<SignalType> onFinally) {
 		Objects.requireNonNull(onFinally, "onFinally");
-		Mono<T> monoDoFinally;
 		if (this instanceof Fuseable) {
-			monoDoFinally = new MonoDoFinallyFuseable<>(this, onFinally);
+			return onAssembly(new MonoDoFinallyFuseable<>(this, onFinally));
 		}
-		else {
-			monoDoFinally = new MonoDoFinally<>(this, onFinally);
-		}
-		return onAssembly(monoDoFinally);
+		return onAssembly(new MonoDoFinally<>(this, onFinally));
 	}
 
 	/**
@@ -2090,7 +2091,7 @@ public abstract class Mono<T> implements Publisher<T> {
 	 * @return a {@link Mono} of materialized {@link Signal}
 	 */
 	public final Mono<Signal<T>> materialize() {
-		return onAssembly(new FluxMaterialize<>(this).next());
+		return onAssembly(new MonoMaterialize<>(this));
 	}
 
 	/**
@@ -3045,7 +3046,7 @@ public abstract class Mono<T> implements Publisher<T> {
 	}
 
 	@SuppressWarnings("unchecked")
-	static <T> Mono<T> doOnSignal(Publisher<T> source,
+	static <T> Mono<T> doOnSignal(Mono<T> source,
 			Consumer<? super Subscription> onSubscribe,
 			Consumer<? super T> onNext,
 			Consumer<? super Throwable> onError,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ final class FluxRepeatWhen<T> extends FluxSource<T, T> {
 
 	final Function<? super Flux<Long>, ? extends Publisher<?>> whenSourceFactory;
 
-	public FluxRepeatWhen(Publisher<? extends T> source,
+	FluxRepeatWhen(Publisher<? extends T> source,
 			Function<? super Flux<Long>, ? extends Publisher<?>> whenSourceFactory) {
 		super(source);
 		this.whenSourceFactory =
@@ -101,7 +101,7 @@ final class FluxRepeatWhen<T> extends FluxSource<T, T> {
 
 		long produced;
 
-		public RepeatWhenMainSubscriber(Subscriber<? super T> actual,
+		RepeatWhenMainSubscriber(Subscriber<? super T> actual,
 				Subscriber<Long> signaller,
 				Publisher<? extends T> source) {
 			super(actual);

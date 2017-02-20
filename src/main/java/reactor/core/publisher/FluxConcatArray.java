@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
-import reactor.core.MultiReceiver;
 import reactor.core.Exceptions;
+import reactor.core.MultiReceiver;
 
 /**
  * Concatenates a fixed array of Publishers' values.
@@ -103,7 +103,7 @@ extends Flux<T>
 	 * @param source the new source to merge with the others
 	 * @return the new FluxConcatArray instance
 	 */
-	public FluxConcatArray<T> concatAdditionalSourceLast(Publisher<? extends T> source) {
+	FluxConcatArray<T> concatAdditionalSourceLast(Publisher<? extends T> source) {
 		int n = array.length;
 		@SuppressWarnings("unchecked")
 		Publisher<? extends T>[] newArray = new Publisher[n + 1];
@@ -123,7 +123,7 @@ extends Flux<T>
 	 * @return the new FluxConcatArray instance
 	 */
 	@SuppressWarnings("unchecked")
-	public <V> FluxConcatArray<V> concatAdditionalIgnoredLast(Publisher<? extends V>
+	<V> FluxConcatArray<V> concatAdditionalIgnoredLast(Publisher<? extends V>
 			source) {
 		int n = array.length;
 		Publisher<? extends V>[] newArray = new Publisher[n + 1];
@@ -144,7 +144,7 @@ extends Flux<T>
 	 * @param source the new source to merge with the others
 	 * @return the new FluxConcatArray instance
 	 */
-	public FluxConcatArray<T> concatAdditionalSourceFirst(Publisher<? extends T> source) {
+	FluxConcatArray<T> concatAdditionalSourceFirst(Publisher<? extends T> source) {
 		int n = array.length;
 		@SuppressWarnings("unchecked")
 		Publisher<? extends T>[] newArray = new Publisher[n + 1];
@@ -169,7 +169,7 @@ extends Flux<T>
 
 		long produced;
 
-		public ConcatArraySubscriber(Subscriber<? super T> actual, Publisher<? extends T>[] sources) {
+		ConcatArraySubscriber(Subscriber<? super T> actual, Publisher<? extends T>[] sources) {
 			super(actual);
 			this.sources = sources;
 		}

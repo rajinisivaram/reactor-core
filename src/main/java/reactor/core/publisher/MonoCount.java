@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package reactor.core.publisher;
 
-import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Fuseable;
@@ -30,7 +29,7 @@ import reactor.core.Receiver;
  */
 final class MonoCount<T> extends MonoSource<T, Long> implements Fuseable {
 
-	public MonoCount(Publisher<? extends T> source) {
+	MonoCount(Flux<? extends T> source) {
 		super(source);
 	}
 

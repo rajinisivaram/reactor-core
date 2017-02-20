@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ final class FluxBufferBoundary<T, U, C extends Collection<? super T>>
 
 	final Supplier<C> bufferSupplier;
 
-	FluxBufferBoundary(Publisher<? extends T> source,
+	FluxBufferBoundary(Flux<? extends T> source,
 			Publisher<U> other,
 			Supplier<C> bufferSupplier) {
 		super(source);

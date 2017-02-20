@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 
-import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Cancellation;
@@ -37,7 +36,7 @@ abstract class FluxBatch<T, V> extends FluxSource<T, V> {
 	final long           timespan;
 	final TimedScheduler timer;
 
-	public FluxBatch(Publisher<T> source,
+	public FluxBatch(Flux<T> source,
 			int batchSize,
 			long timespan,
 			final TimedScheduler timer) {

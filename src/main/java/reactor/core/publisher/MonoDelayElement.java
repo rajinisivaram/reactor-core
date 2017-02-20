@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,7 +19,6 @@ package reactor.core.publisher;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Cancellation;
@@ -43,7 +42,7 @@ final class MonoDelayElement<T> extends MonoSource<T, T> {
 
 	final TimeUnit unit;
 
-	public MonoDelayElement(Publisher<? extends T> source, long delay, TimeUnit unit, TimedScheduler timedScheduler) {
+	MonoDelayElement(Mono<? extends T> source, long delay, TimeUnit unit, TimedScheduler timedScheduler) {
 		super(source);
 		this.delay = delay;
 		this.unit = Objects.requireNonNull(unit, "unit");
