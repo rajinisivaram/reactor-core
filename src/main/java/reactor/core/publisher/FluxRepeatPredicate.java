@@ -33,7 +33,12 @@ final class FluxRepeatPredicate<T> extends FluxSource<T, T> {
 
 	final BooleanSupplier predicate;
 
-	FluxRepeatPredicate(Publisher<? extends T> source, BooleanSupplier predicate) {
+	FluxRepeatPredicate(Flux<? extends T> source, BooleanSupplier predicate) {
+		super(source);
+		this.predicate = Objects.requireNonNull(predicate, "predicate");
+	}
+
+	FluxRepeatPredicate(Mono<? extends T> source, BooleanSupplier predicate) {
 		super(source);
 		this.predicate = Objects.requireNonNull(predicate, "predicate");
 	}

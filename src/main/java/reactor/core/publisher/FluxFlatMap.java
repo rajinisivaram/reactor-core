@@ -59,6 +59,15 @@ final class FluxFlatMap<T, R> extends FluxSource<T, R> {
 
 	final Supplier<? extends Queue<R>> innerQueueSupplier;
 
+	void check(int prefetch, int maxConcurrency) {
+		if (prefetch <= 0) {
+			throw new IllegalArgumentException("prefetch > 0 required but it was " + prefetch);
+		}
+		if (maxConcurrency <= 0) {
+			throw new IllegalArgumentException("maxConcurrency > 0 required but it was " + maxConcurrency);
+		}
+	}
+
 	FluxFlatMap(Publisher<? extends T> source,
 			Function<? super T, ? extends Publisher<? extends R>> mapper,
 			boolean delayError,
@@ -67,12 +76,45 @@ final class FluxFlatMap<T, R> extends FluxSource<T, R> {
 			int prefetch,
 			Supplier<? extends Queue<R>> innerQueueSupplier) {
 		super(source);
-		if (prefetch <= 0) {
-			throw new IllegalArgumentException("prefetch > 0 required but it was " + prefetch);
-		}
-		if (maxConcurrency <= 0) {
-			throw new IllegalArgumentException("maxConcurrency > 0 required but it was " + maxConcurrency);
-		}
+		check(prefetch, maxConcurrency);
+		this.mapper = Objects.requireNonNull(mapper, "mapper");
+		this.delayError = delayError;
+		this.prefetch = prefetch;
+		this.maxConcurrency = maxConcurrency;
+		this.mainQueueSupplier =
+				Objects.requireNonNull(mainQueueSupplier, "mainQueueSupplier");
+		this.innerQueueSupplier =
+				Objects.requireNonNull(innerQueueSupplier, "innerQueueSupplier");
+	}
+
+	FluxFlatMap(Flux<? extends T> source,
+			Function<? super T, ? extends Publisher<? extends R>> mapper,
+			boolean delayError,
+			int maxConcurrency,
+			Supplier<? extends Queue<R>> mainQueueSupplier,
+			int prefetch,
+			Supplier<? extends Queue<R>> innerQueueSupplier) {
+		super(source);
+		check(prefetch, maxConcurrency);
+		this.mapper = Objects.requireNonNull(mapper, "mapper");
+		this.delayError = delayError;
+		this.prefetch = prefetch;
+		this.maxConcurrency = maxConcurrency;
+		this.mainQueueSupplier =
+				Objects.requireNonNull(mainQueueSupplier, "mainQueueSupplier");
+		this.innerQueueSupplier =
+				Objects.requireNonNull(innerQueueSupplier, "innerQueueSupplier");
+	}
+
+	FluxFlatMap(Mono<? extends T> source,
+			Function<? super T, ? extends Publisher<? extends R>> mapper,
+			boolean delayError,
+			int maxConcurrency,
+			Supplier<? extends Queue<R>> mainQueueSupplier,
+			int prefetch,
+			Supplier<? extends Queue<R>> innerQueueSupplier) {
+		super(source);
+		check(prefetch, maxConcurrency);
 		this.mapper = Objects.requireNonNull(mapper, "mapper");
 		this.delayError = delayError;
 		this.prefetch = prefetch;

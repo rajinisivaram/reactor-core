@@ -33,7 +33,15 @@ final class FluxRepeat<T> extends FluxSource<T, T> {
 
 	final long times;
 
-	FluxRepeat(Publisher<? extends T> source, long times) {
+	FluxRepeat(Flux<? extends T> source, long times) {
+		super(source);
+		if (times < 0L) {
+			throw new IllegalArgumentException("times >= 0 required");
+		}
+		this.times = times;
+	}
+
+	FluxRepeat(Mono<? extends T> source, long times) {
 		super(source);
 		if (times < 0L) {
 			throw new IllegalArgumentException("times >= 0 required");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -166,15 +166,12 @@ final class FluxCombineLatest<T, R> extends Flux<R> implements MultiReceiver, Fu
 			return;
 		}
 		if (n == 1) {
+			Function<T, R> f = t -> combiner.apply(new Object[]{t});
 			if (a[0] instanceof Fuseable) {
-				new FluxMapFuseable<>(a[0],
-						(Function<T, R>) t -> combiner.apply(new Object[]{
-								t})).subscribe(s);
+				new FluxMapFuseable<>(a[0], f).subscribe(s);
 			}
 			else {
-				new FluxMap<>(a[0],
-						(Function<T, R>) t -> combiner.apply(new Object[]{
-								t})).subscribe(s);
+				new FluxMap<>(a[0], f).subscribe(s);
 			}
 			return;
 		}

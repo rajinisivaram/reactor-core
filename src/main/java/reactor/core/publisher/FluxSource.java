@@ -58,9 +58,18 @@ public class FluxSource<I, O> extends Flux<O> implements Receiver {
 	/**
 	 * Build a {@link FluxSource} wrapper around the passed parent {@link Flux}
 	 *
-	 * @param source the {@link Publisher} to decorate
+	 * @param source the {@link Flux} to decorate
 	 */
 	protected FluxSource(Flux<? extends I> source) {
+		this.source = Objects.requireNonNull(source);
+	}
+
+	/**
+	 * Build a {@link FluxSource} wrapper around the passed parent {@link Mono}
+	 *
+	 * @param source the {@link Mono} to decorate
+	 */
+	protected FluxSource(Mono<? extends I> source) {
 		this.source = Objects.requireNonNull(source);
 	}
 

@@ -41,7 +41,14 @@ final class FluxRepeatWhen<T> extends FluxSource<T, T> {
 
 	final Function<? super Flux<Long>, ? extends Publisher<?>> whenSourceFactory;
 
-	FluxRepeatWhen(Publisher<? extends T> source,
+	FluxRepeatWhen(Flux<? extends T> source,
+			Function<? super Flux<Long>, ? extends Publisher<?>> whenSourceFactory) {
+		super(source);
+		this.whenSourceFactory =
+				Objects.requireNonNull(whenSourceFactory, "whenSourceFactory");
+	}
+
+	FluxRepeatWhen(Mono<? extends T> source,
 			Function<? super Flux<Long>, ? extends Publisher<?>> whenSourceFactory) {
 		super(source);
 		this.whenSourceFactory =

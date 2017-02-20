@@ -1244,7 +1244,7 @@ public abstract class Flux<T> implements Publisher<T> {
 	 * @return a {@link FluxProcessor} accepting publishers and producing T
 	 */
 	public static <T> Flux<T> switchOnNext(Publisher<? extends Publisher<? extends T>> mergedPublishers, int prefetch) {
-		return onAssembly(new FluxSwitchMap<>(mergedPublishers,
+		return onAssembly(new FluxSwitchMap<>(Flux.from(mergedPublishers),
 				identityFunction(),
 				QueueSupplier.unbounded(prefetch), prefetch));
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,20 @@ final class FluxFlattenIterable<T, R> extends FluxSource<T, R> implements Fuseab
 
 	final Supplier<Queue<T>> queueSupplier;
 
-	FluxFlattenIterable(Publisher<? extends T> source,
+	FluxFlattenIterable(Flux<? extends T> source,
+			Function<? super T, ? extends Iterable<? extends R>> mapper,
+			int prefetch,
+			Supplier<Queue<T>> queueSupplier) {
+		super(source);
+		if (prefetch <= 0) {
+			throw new IllegalArgumentException("prefetch > 0 required but it was " + prefetch);
+		}
+		this.mapper = Objects.requireNonNull(mapper, "mapper");
+		this.prefetch = prefetch;
+		this.queueSupplier = Objects.requireNonNull(queueSupplier, "queueSupplier");
+	}
+
+	FluxFlattenIterable(Mono<? extends T> source,
 			Function<? super T, ? extends Iterable<? extends R>> mapper,
 			int prefetch,
 			Supplier<Queue<T>> queueSupplier) {

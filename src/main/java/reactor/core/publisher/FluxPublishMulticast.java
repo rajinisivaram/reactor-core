@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,20 @@ final class FluxPublishMulticast<T, R> extends FluxSource<T, R> implements Fusea
 
 	final int prefetch;
 
-	FluxPublishMulticast(Publisher<? extends T> source,
+	FluxPublishMulticast(Flux<? extends T> source,
+			Function<? super Flux<T>, ? extends Publisher<? extends R>> transform,
+			int prefetch,
+			Supplier<? extends Queue<T>> queueSupplier) {
+		super(source);
+		if (prefetch < 1) {
+			throw new IllegalArgumentException("prefetch > 0 required but it was " + prefetch);
+		}
+		this.prefetch = prefetch;
+		this.transform = Objects.requireNonNull(transform, "transform");
+		this.queueSupplier = Objects.requireNonNull(queueSupplier, "queueSupplier");
+	}
+
+	FluxPublishMulticast(Mono<? extends T> source,
 			Function<? super Flux<T>, ? extends Publisher<? extends R>> transform,
 			int prefetch,
 			Supplier<? extends Queue<T>> queueSupplier) {
@@ -710,7 +723,7 @@ final class FluxPublishMulticast<T, R> extends FluxSource<T, R> implements Fusea
 
 		QueueSubscription<T> s;
 
-		public CancelFuseableMulticaster(Subscriber<? super T> actual,
+		CancelFuseableMulticaster(Subscriber<? super T> actual,
 				FluxPublishMulticaster<?, ?> parent) {
 			this.actual = actual;
 			this.parent = parent;

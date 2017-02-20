@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,12 @@ final class FluxMap<T, R> extends FluxSource<T, R> {
 	 *
 	 * @throws NullPointerException if either {@code source} or {@code mapper} is null.
 	 */
+	FluxMap(Flux<? extends T> source,
+			Function<? super T, ? extends R> mapper) {
+		super(source);
+		this.mapper = Objects.requireNonNull(mapper, "mapper");
+	}
+
 	FluxMap(Publisher<? extends T> source,
 			Function<? super T, ? extends R> mapper) {
 		super(source);

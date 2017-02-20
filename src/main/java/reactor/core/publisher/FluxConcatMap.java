@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,6 +82,21 @@ final class FluxConcatMap<T, R> extends FluxSource<T, R> {
 				parent = new ConcatMapImmediate<>(s, mapper, queueSupplier, prefetch);
 		}
 		return parent;
+	}
+
+	FluxConcatMap(Flux<? extends T> source,
+			Function<? super T, ? extends Publisher<? extends R>> mapper,
+			Supplier<? extends Queue<T>> queueSupplier,
+			int prefetch,
+			ErrorMode errorMode) {
+		super(source);
+		if (prefetch <= 0) {
+			throw new IllegalArgumentException("prefetch > 0 required but it was " + prefetch);
+		}
+		this.mapper = Objects.requireNonNull(mapper, "mapper");
+		this.queueSupplier = Objects.requireNonNull(queueSupplier, "queueSupplier");
+		this.prefetch = prefetch;
+		this.errorMode = Objects.requireNonNull(errorMode, "errorMode");
 	}
 
 	FluxConcatMap(Publisher<? extends T> source,

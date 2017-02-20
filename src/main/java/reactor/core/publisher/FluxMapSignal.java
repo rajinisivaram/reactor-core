@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,21 @@ final class FluxMapSignal<T, R> extends FluxSource<T, R> {
      *
      * @throws NullPointerException if either {@code source} or {@code mapper} is null.
      */
-    FluxMapSignal(Publisher<? extends T> source,
+    FluxMapSignal(Flux<? extends T> source,
+            Function<? super T, ? extends R> mapperNext,
+            Function<Throwable, ? extends R> mapperError,
+            Supplier<? extends R>            mapperComplete) {
+        super(source);
+	    if(mapperNext == null && mapperError == null && mapperComplete == null){
+		    throw new IllegalArgumentException("Map Signal needs at least one valid mapper");
+	    }
+
+        this.mapperNext = mapperNext;
+        this.mapperError = mapperError;
+        this.mapperComplete = mapperComplete;
+    }
+
+    FluxMapSignal(Mono<? extends T> source,
             Function<? super T, ? extends R> mapperNext,
             Function<Throwable, ? extends R> mapperError,
             Supplier<? extends R>            mapperComplete) {
