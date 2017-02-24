@@ -30,14 +30,13 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
 import reactor.core.Fuseable;
-import reactor.core.Loopback;
 import reactor.core.MultiProducer;
 import reactor.core.MultiReceiver;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Hooks;
+import reactor.core.publisher.OperatorContext;
 import reactor.core.publisher.Operators;
 import reactor.core.publisher.ParallelFlux;
 import reactor.core.publisher.ReplayProcessor;
@@ -591,7 +590,7 @@ public abstract class BaseOperatorTest<I, PI extends Publisher<? extends I>, O, 
 				            if (s instanceof Fuseable.QueueSubscription) {
 					            Fuseable.QueueSubscription<O> qs = ((Fuseable.QueueSubscription<O>) s);
 					            qs.requestFusion(ASYNC);
-					            if (up.downstream() != qs || scenario.prefetch() == UNSPECIFIED) {
+					            if (up.actual() != qs || scenario.prefetch() == UNSPECIFIED) {
 						            qs.size(); //touch undeterministic
 					            }
 					            else {
@@ -610,7 +609,7 @@ public abstract class BaseOperatorTest<I, PI extends Publisher<? extends I>, O, 
 									            scenario.producerError
 									                    .getMessage());
 						            }
-						            if (up.downstream() != qs || scenario.prefetch() == UNSPECIFIED) {
+						            if (up.actual() != qs || scenario.prefetch() == UNSPECIFIED) {
 							            qs.size(); //touch undeterministic
 						            }
 						            else {
@@ -651,7 +650,7 @@ public abstract class BaseOperatorTest<I, PI extends Publisher<? extends I>, O, 
 				            if (s instanceof Fuseable.QueueSubscription) {
 					            Fuseable.QueueSubscription<O> qs = ((Fuseable.QueueSubscription<O>) ((Receiver) s).upstream());
 					            qs.requestFusion(ASYNC);
-					            if (up.downstream() != qs || scenario.prefetch() == UNSPECIFIED) {
+					            if (up.actual() != qs || scenario.prefetch() == UNSPECIFIED) {
 						            qs.size(); //touch undeterministic
 					            }
 					            else {
@@ -670,7 +669,7 @@ public abstract class BaseOperatorTest<I, PI extends Publisher<? extends I>, O, 
 									            scenario.producerError
 									                    .getMessage());
 						            }
-						            if (up.downstream() != qs || scenario.prefetch() == UNSPECIFIED) {
+						            if (up.actual() != qs || scenario.prefetch() == UNSPECIFIED) {
 							            qs.size(); //touch undeterministic
 						            }
 						            else {
@@ -914,22 +913,22 @@ public abstract class BaseOperatorTest<I, PI extends Publisher<? extends I>, O, 
 	final Runnable testUnicastDropPath(OperatorScenario<I, PI, O, PO> scenario,
 			UnicastProcessor<I> up) {
 		return () -> {
-			if (up.downstream() != null) {
-				up.downstream()
+			if (up.actual() != null) {
+				up.actual()
 				  .onError(exception());
 
 				//verify drop path
 				if (scenario.shouldHitDropErrorHookAfterTerminate()) {
-					up.downstream()
+					up.actual()
 					  .onComplete();
-					up.downstream()
+					up.actual()
 					  .onError(scenario.droppedError);
 				}
 				if (scenario.shouldHitDropNextHookAfterTerminate()) {
-					FluxFuseableExceptionOnPoll.next(up.downstream(), scenario.droppedItem);
+					FluxFuseableExceptionOnPoll.next(up.actual(), scenario.droppedItem);
 
-					if (FluxFuseableExceptionOnPoll.shouldTryNext(up.downstream())) {
-						FluxFuseableExceptionOnPoll.tryNext(up.downstream(), scenario.droppedItem);
+					if (FluxFuseableExceptionOnPoll.shouldTryNext(up.actual())) {
+						FluxFuseableExceptionOnPoll.tryNext(up.actual(), scenario.droppedItem);
 					}
 				}
 
@@ -950,12 +949,8 @@ public abstract class BaseOperatorTest<I, PI extends Publisher<? extends I>, O, 
 			o.isStarted();
 			o.isCancelled();
 		}
-		if(t instanceof Producer){
-			((Producer)t).downstream();
-		}
-		if(t instanceof Loopback){
-			((Loopback)t).connectedInput();
-			((Loopback)t).connectedOutput();
+		if(t instanceof OperatorContext){
+			((OperatorContext)t).actual();
 		}
 		if(t instanceof Receiver){
 			((Receiver)t).upstream();
@@ -968,13 +963,9 @@ public abstract class BaseOperatorTest<I, PI extends Publisher<? extends I>, O, 
 		if (parent == null) {
 			return;
 		}
-		if (parent instanceof Loopback) {
-			assertThat(((Loopback) parent).connectedInput()).isNotNull();
-			((Loopback) parent).connectedOutput();
-		}
 
-		if (parent instanceof Producer) {
-			assertThat(((Producer) parent).downstream()).isNotNull();
+		if (parent instanceof OperatorContext) {
+			assertThat(((OperatorContext) parent).actual()).isNotNull();
 		}
 
 		if (parent instanceof MultiProducer){
@@ -1025,8 +1016,8 @@ public abstract class BaseOperatorTest<I, PI extends Publisher<? extends I>, O, 
 			boolean conditional) {
 		AtomicReference<Trackable> ref = new AtomicReference<>();
 		Flux<I> source = fluxFuseableAsync(scenario).doOnSubscribe(s -> {
-			if (s instanceof Producer) {
-				Object _s = ((Producer) ((Producer) s).downstream()).downstream();
+			if (s instanceof OperatorContext) {
+				Object _s = ((OperatorContext) ((OperatorContext) s).actual()).actual();
 				if (_s instanceof Trackable) {
 					Trackable t = (Trackable) _s;
 					ref.set(t);
@@ -1187,9 +1178,6 @@ public abstract class BaseOperatorTest<I, PI extends Publisher<? extends I>, O, 
 					assertThat(Math.min(((ParallelFlux) f).getPrefetch(),
 							Integer.MAX_VALUE)).isEqualTo(scenario.prefetch());
 				}
-			}
-			if (f instanceof Loopback) {
-				assertThat(((Loopback) f).connectedInput()).isNotNull();
 			}
 		}
 		return f;

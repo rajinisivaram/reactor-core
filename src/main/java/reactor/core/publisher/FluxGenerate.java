@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,7 +122,7 @@ extends Flux<T> implements Fuseable {
 		static final AtomicLongFieldUpdater<GenerateSubscription> REQUESTED =
 			AtomicLongFieldUpdater.newUpdater(GenerateSubscription.class, "requested");
 
-		public GenerateSubscription(Subscriber<? super T> actual, S state,
+		GenerateSubscription(Subscriber<? super T> actual, S state,
 											 BiFunction<S, SynchronousSink<T>, S> generator, Consumer<? super
 		  S> stateConsumer) {
 			this.actual = actual;

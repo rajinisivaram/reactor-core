@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package reactor.core.publisher;
 
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -34,7 +33,7 @@ import reactor.core.Trackable;
  *
  * @param <T> the value type
  */
-final class SerializedSubscriber<T> implements Subscriber<T>, Subscription, Receiver, Producer,
+final class SerializedSubscriber<T> implements Subscriber<T>, Subscription, Receiver, OperatorContext<T>,
                                                Trackable {
 
 	final Subscriber<? super T> actual;
@@ -235,7 +234,7 @@ final class SerializedSubscriber<T> implements Subscriber<T>, Subscription, Rece
 	}
 
 	@Override
-	public Subscriber<? super T> downstream() {
+	public Subscriber<? super T> actual() {
 		return actual;
 	}
 

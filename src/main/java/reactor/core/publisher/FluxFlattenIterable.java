@@ -121,7 +121,7 @@ final class FluxFlattenIterable<T, R> extends FluxSource<T, R> implements Fuseab
 	}
 
 	static final class FlattenIterableSubscriber<T, R>
-			implements Subscriber<T>, QueueSubscription<R> {
+			implements Subscriber<T>, OperatorContext<R>, QueueSubscription<R> {
 
 		final Subscriber<? super R> actual;
 
@@ -176,6 +176,11 @@ final class FluxFlattenIterable<T, R> extends FluxSource<T, R> implements Fuseab
 			this.prefetch = prefetch;
 			this.queueSupplier = queueSupplier;
 			this.limit = prefetch - (prefetch >> 2);
+		}
+
+		@Override
+		public Subscriber<? super R> actual() {
+			return actual;
 		}
 
 		@Override

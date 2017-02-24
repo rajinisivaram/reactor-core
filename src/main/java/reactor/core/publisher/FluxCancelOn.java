@@ -40,7 +40,7 @@ final class FluxCancelOn<T> extends FluxSource<T, T> {
 	}
 
 	static final class CancelSubscriber<T>
-			implements Subscriber<T>, Subscription, Runnable {
+			implements Subscriber<T>, OperatorContext<T>, Subscription, Runnable {
 
 		final Subscriber<? super T> actual;
 		final Scheduler             scheduler;
@@ -51,7 +51,7 @@ final class FluxCancelOn<T> extends FluxSource<T, T> {
 		static final AtomicIntegerFieldUpdater<CancelSubscriber> CANCELLED =
 				AtomicIntegerFieldUpdater.newUpdater(CancelSubscriber.class, "cancelled");
 
-		public CancelSubscriber(Subscriber<? super T> actual, Scheduler scheduler) {
+		CancelSubscriber(Subscriber<? super T> actual, Scheduler scheduler) {
 			this.actual = actual;
 			this.scheduler = scheduler;
 		}
@@ -62,6 +62,11 @@ final class FluxCancelOn<T> extends FluxSource<T, T> {
 				this.s = s;
 				actual.onSubscribe(this);
 			}
+		}
+
+		@Override
+		public Subscriber<? super T> actual() {
+			return actual;
 		}
 
 		@Override

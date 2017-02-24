@@ -27,8 +27,6 @@ import org.reactivestreams.Subscription;
 import reactor.core.Cancellation;
 import reactor.core.Exceptions;
 import reactor.core.Fuseable;
-import reactor.core.Loopback;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 import reactor.core.scheduler.Scheduler;
@@ -41,7 +39,7 @@ import reactor.core.scheduler.Scheduler.Worker;
  *
  * @see <a href="https://github.com/reactor/reactive-streams-commons">Reactive-Streams-Commons</a>
  */
-final class FluxPublishOn<T> extends FluxSource<T, T> implements Loopback, Fuseable {
+final class FluxPublishOn<T> extends FluxSource<T, T> implements Fuseable {
 
 	final Scheduler scheduler;
 
@@ -103,13 +101,8 @@ final class FluxPublishOn<T> extends FluxSource<T, T> implements Loopback, Fusea
 				queueSupplier));
 	}
 
-	@Override
-	public Object connectedInput() {
-		return scheduler;
-	}
-
 	static final class PublishOnSubscriber<T>
-			implements Subscriber<T>, QueueSubscription<T>, Runnable, Producer, Loopback,
+			implements Subscriber<T>, QueueSubscription<T>, Runnable, OperatorContext<T>,
 			           Receiver, Trackable {
 
 		final Subscriber<? super T> actual;
@@ -560,16 +553,6 @@ final class FluxPublishOn<T> extends FluxSource<T, T> implements Loopback, Fusea
 		}
 
 		@Override
-		public Object connectedInput() {
-			return scheduler;
-		}
-
-		@Override
-		public Object connectedOutput() {
-			return worker;
-		}
-
-		@Override
 		public long expectedFromUpstream() {
 			return queue == null ? 0 : (prefetch - queue.size());
 		}
@@ -580,7 +563,7 @@ final class FluxPublishOn<T> extends FluxSource<T, T> implements Loopback, Fusea
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 
@@ -631,7 +614,7 @@ final class FluxPublishOn<T> extends FluxSource<T, T> implements Loopback, Fusea
 	}
 
 	static final class PublishOnConditionalSubscriber<T>
-			implements Subscriber<T>, QueueSubscription<T>, Runnable, Producer, Loopback,
+			implements Subscriber<T>, QueueSubscription<T>, Runnable, OperatorContext<T>,
 			           Receiver, Trackable {
 
 		final ConditionalSubscriber<? super T> actual;
@@ -1026,16 +1009,6 @@ final class FluxPublishOn<T> extends FluxSource<T, T> implements Loopback, Fusea
 		}
 
 		@Override
-		public Object connectedInput() {
-			return scheduler;
-		}
-
-		@Override
-		public Object connectedOutput() {
-			return worker;
-		}
-
-		@Override
 		public long expectedFromUpstream() {
 			return queue == null ? 0 : (prefetch - queue.size());
 		}
@@ -1046,7 +1019,7 @@ final class FluxPublishOn<T> extends FluxSource<T, T> implements Loopback, Fusea
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

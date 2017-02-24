@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,7 +121,7 @@ final class FluxUsing<T, S> extends Flux<T> implements Receiver, Fuseable {
 	}
 
 	static final class UsingSubscriber<T, S>
-			implements Subscriber<T>, QueueSubscription<T> {
+			implements Subscriber<T>, OperatorContext<T>, QueueSubscription<T> {
 
 		final Subscriber<? super T> actual;
 
@@ -138,7 +138,7 @@ final class FluxUsing<T, S> extends Flux<T> implements Receiver, Fuseable {
 		static final AtomicIntegerFieldUpdater<UsingSubscriber> WIP =
 				AtomicIntegerFieldUpdater.newUpdater(UsingSubscriber.class, "wip");
 
-		public UsingSubscriber(Subscriber<? super T> actual,
+		UsingSubscriber(Subscriber<? super T> actual,
 				Consumer<? super S> resourceCleanup,
 				S resource,
 				boolean eager) {
@@ -146,6 +146,11 @@ final class FluxUsing<T, S> extends Flux<T> implements Receiver, Fuseable {
 			this.resourceCleanup = resourceCleanup;
 			this.resource = resource;
 			this.eager = eager;
+		}
+
+		@Override
+		public Subscriber<? super T> actual() {
+			return actual;
 		}
 
 		@Override
@@ -252,7 +257,7 @@ final class FluxUsing<T, S> extends Flux<T> implements Receiver, Fuseable {
 	}
 
 	static final class UsingFuseableSubscriber<T, S>
-			implements Subscriber<T>, QueueSubscription<T> {
+			implements Subscriber<T>, OperatorContext<T>, QueueSubscription<T> {
 
 		final Subscriber<? super T> actual;
 
@@ -280,6 +285,11 @@ final class FluxUsing<T, S> extends Flux<T> implements Receiver, Fuseable {
 			this.resourceCleanup = resourceCleanup;
 			this.resource = resource;
 			this.eager = eager;
+		}
+
+		@Override
+		public Subscriber<? super T> actual() {
+			return actual;
 		}
 
 		@Override
@@ -395,7 +405,8 @@ final class FluxUsing<T, S> extends Flux<T> implements Receiver, Fuseable {
 	}
 
 	static final class UsingConditionalSubscriber<T, S>
-			implements ConditionalSubscriber<T>, QueueSubscription<T> {
+			implements ConditionalSubscriber<T>, OperatorContext<T>,
+			           QueueSubscription<T> {
 
 		final ConditionalSubscriber<? super T> actual;
 
@@ -421,6 +432,11 @@ final class FluxUsing<T, S> extends Flux<T> implements Receiver, Fuseable {
 			this.resourceCleanup = resourceCleanup;
 			this.resource = resource;
 			this.eager = eager;
+		}
+
+		@Override
+		public Subscriber<? super T> actual() {
+			return actual;
 		}
 
 		@Override

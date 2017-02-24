@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,6 +24,7 @@ import reactor.core.Disposable;
 import reactor.core.Exceptions;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
+import reactor.util.Context;
 
 /**
  * A simple base class for a {@link Subscriber} implementation that lets the user
@@ -44,7 +45,7 @@ import reactor.core.Trackable;
  * @author Simon Baslé
  */
 public abstract class BaseSubscriber<T> implements Subscriber<T>, Subscription, Trackable,
-                                                   Receiver, Disposable {
+                                                   Receiver, Disposable, OperatorContext<T> {
 
 	volatile Subscription subscription;
 
@@ -54,6 +55,16 @@ public abstract class BaseSubscriber<T> implements Subscriber<T>, Subscription, 
 	@Override
 	public Subscription upstream() {
 		return subscription;
+	}
+
+	@Override
+	public Subscriber<? super T> actual() {
+		return null;
+	}
+
+	@Override
+	public final void onContext(Context context) {
+		hookOnContext(context);
 	}
 
 	@Override
@@ -94,6 +105,13 @@ public abstract class BaseSubscriber<T> implements Subscriber<T>, Subscription, 
 	 * Optional hook for completion processing. Defaults to doing nothing.
 	 */
 	protected void hookOnComplete() {
+		// NO-OP
+	}
+
+	/**
+	 * Optional hook for context handling. Defaults to doing nothing.
+	 */
+	protected void hookOnContext(Context context) {
 		// NO-OP
 	}
 

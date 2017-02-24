@@ -28,8 +28,6 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
 import reactor.core.Fuseable;
-import reactor.core.Loopback;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 import reactor.util.Logger;
@@ -871,7 +869,7 @@ public abstract class Operators {
 	 */
 	public static class MonoSubscriber<I, O> implements Subscriber<I>,
 	                                                    Trackable,
-	                                                    Receiver, Producer,
+	                                                    Receiver, OperatorContext<O>,
 	                                                    Fuseable, //for constants only
 	                                                    Fuseable.QueueSubscription<O> {
 
@@ -944,7 +942,7 @@ public abstract class Operators {
 		}
 
 		@Override
-		public final Subscriber<? super O> downstream() {
+		public final Subscriber<? super O> actual() {
 			return actual;
 		}
 
@@ -1104,7 +1102,8 @@ public abstract class Operators {
 	 * @param <O> the output value type
 	 */
 	public static class SubscriberAdapter<I, O>
-			implements Subscriber<I>, Subscription, Trackable, Receiver, Producer{
+			implements Subscriber<I>, Subscription, Trackable, Receiver,
+			           OperatorContext<O>{
 
 		protected final Subscriber<? super O> subscriber;
 
@@ -1124,7 +1123,7 @@ public abstract class Operators {
 		}
 
 		@Override
-		public Subscriber<? super O> downstream() {
+		public Subscriber<? super O> actual() {
 			return subscriber;
 		}
 
@@ -1274,7 +1273,7 @@ public abstract class Operators {
 	 * @param <O> the output value type
 	 */
 	abstract static class MultiSubscriptionSubscriber<I, O>
-			implements Subscription, Subscriber<I>, Producer, Trackable,
+			implements Subscription, Subscriber<I>, OperatorContext<O>, Trackable,
 			           Receiver {
 
 		protected final Subscriber<? super O> subscriber;
@@ -1307,7 +1306,7 @@ public abstract class Operators {
 		}
 
 		@Override
-		public final Subscriber<? super O> downstream() {
+		public final Subscriber<? super O> actual() {
 			return subscriber;
 		}
 
@@ -1608,7 +1607,7 @@ public abstract class Operators {
 	 * @param <T> the value type
 	 */
 	static final class ScalarSubscription<T>
-			implements Fuseable.QueueSubscription<T>, Producer, Receiver {
+			implements Fuseable.QueueSubscription<T>, OperatorContext<T>, Receiver {
 
 		final Subscriber<? super T> actual;
 
@@ -1631,7 +1630,7 @@ public abstract class Operators {
 		}
 
 		@Override
-		public final Subscriber<? super T> downstream() {
+		public final Subscriber<? super T> actual() {
 			return actual;
 		}
 

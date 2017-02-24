@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,9 @@ import reactor.core.Trackable;
 final class MonoNever
 extends Mono<Object> implements Trackable {
 
-	private static final Mono<Object> INSTANCE = new MonoNever();
+	static final Mono<Object> INSTANCE = new MonoNever();
 
-	private MonoNever() {
+	MonoNever() {
 		// deliberately no op
 	}
 
@@ -47,7 +47,7 @@ extends Mono<Object> implements Trackable {
 	 * @return a properly parametrized instance of this never Publisher
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> Mono<T> instance() {
+	static <T> Mono<T> instance() {
 		return (Mono<T>) INSTANCE;
 	}
 

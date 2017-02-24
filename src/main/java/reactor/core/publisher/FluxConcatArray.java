@@ -41,7 +41,7 @@ extends Flux<T>
 	final boolean delayError;
 
 	@SafeVarargs
-	public FluxConcatArray(boolean delayError, Publisher<? extends T>... array) {
+	FluxConcatArray(boolean delayError, Publisher<? extends T>... array) {
 		this.array = Objects.requireNonNull(array, "array");
 		this.delayError = delayError;
 	}
@@ -241,7 +241,7 @@ extends Flux<T>
 		
 		long produced;
 
-		public ConcatArrayDelayErrorSubscriber(Subscriber<? super T> actual, Publisher<? extends T>[] sources) {
+		ConcatArrayDelayErrorSubscriber(Subscriber<? super T> actual, Publisher<? extends T>[] sources) {
 			super(actual);
 			this.sources = sources;
 		}

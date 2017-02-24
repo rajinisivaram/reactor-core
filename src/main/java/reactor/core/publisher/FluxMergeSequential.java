@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -95,7 +95,8 @@ final class FluxMergeSequential<T, R> extends FluxSource<T, R> {
 	}
 
 	static final class MergeSequentialMain<T, R>
-			implements Subscriber<T>, FluxMergeSequentialSupport<R>, Subscription {
+			implements Subscriber<T>, OperatorContext<R>, FluxMergeSequentialSupport<R>,
+			Subscription {
 
 		/** the downstream subscriber */
 		final Subscriber<? super R> actual;
@@ -290,6 +291,11 @@ final class FluxMergeSequential<T, R> extends FluxSource<T, R> {
 		public void innerComplete(MergeSequentialInner<R> inner) {
 			inner.setDone();
 			drain();
+		}
+
+		@Override
+		public Subscriber<? super R> actual() {
+			return actual;
 		}
 
 		@Override

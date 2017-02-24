@@ -21,8 +21,6 @@ import java.util.function.Predicate;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Fuseable.ConditionalSubscriber;
-import reactor.core.Loopback;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -48,7 +46,7 @@ final class FluxSkipUntil<T> extends FluxSource<T, T> {
 	}
 
 	static final class SkipUntilSubscriber<T>
-			implements ConditionalSubscriber<T>, Receiver, Producer, Loopback,
+			implements ConditionalSubscriber<T>, Receiver, OperatorContext<T>,
 			           Subscription, Trackable {
 		final Subscriber<? super T> actual;
 
@@ -165,13 +163,8 @@ final class FluxSkipUntil<T> extends FluxSource<T, T> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return predicate;
 		}
 
 		@Override

@@ -30,7 +30,6 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Fuseable;
 import reactor.core.MultiProducer;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 import reactor.core.scheduler.Schedulers;
@@ -569,7 +568,7 @@ public final class ReplayProcessor<T> extends FluxProcessor<T, T>
 		void replayNormal(ReplaySubscription<T> rs) {
 			int missed = 1;
 
-			final Subscriber<? super T> a = rs.downstream();
+			final Subscriber<? super T> a = rs.actual();
 			final int n = batchSize;
 
 			for (; ; ) {
@@ -665,7 +664,7 @@ public final class ReplayProcessor<T> extends FluxProcessor<T, T>
 		void replayFused(ReplaySubscription<T> rs) {
 			int missed = 1;
 
-			final Subscriber<? super T> a = rs.downstream();
+			final Subscriber<? super T> a = rs.actual();
 
 			for (; ; ) {
 
@@ -814,7 +813,7 @@ public final class ReplayProcessor<T> extends FluxProcessor<T, T>
 		}
 
 		void replayNormal(ReplaySubscription<T> rs) {
-			final Subscriber<? super T> a = rs.downstream();
+			final Subscriber<? super T> a = rs.actual();
 
 			int missed = 1;
 
@@ -900,7 +899,7 @@ public final class ReplayProcessor<T> extends FluxProcessor<T, T>
 		void replayFused(ReplaySubscription<T> rs) {
 			int missed = 1;
 
-			final Subscriber<? super T> a = rs.downstream();
+			final Subscriber<? super T> a = rs.actual();
 
 			for (; ; ) {
 
@@ -1070,7 +1069,7 @@ public final class ReplayProcessor<T> extends FluxProcessor<T, T>
 		@SuppressWarnings("unchecked")
 		void replayNormal(ReplaySubscription<T> rs) {
 			int missed = 1;
-			final Subscriber<? super T> a = rs.downstream();
+			final Subscriber<? super T> a = rs.actual();
 
 			for (; ; ) {
 				@SuppressWarnings("unchecked") TimedNode<T> node =
@@ -1167,7 +1166,7 @@ public final class ReplayProcessor<T> extends FluxProcessor<T, T>
 		void replayFused(ReplaySubscription<T> rs) {
 			int missed = 1;
 
-			final Subscriber<? super T> a = rs.downstream();
+			final Subscriber<? super T> a = rs.actual();
 
 			for (; ; ) {
 
@@ -1354,10 +1353,10 @@ public final class ReplayProcessor<T> extends FluxProcessor<T, T>
 		}
 	}
 
-	interface ReplaySubscription<T> extends Producer, Trackable, QueueSubscription<T> {
+	interface ReplaySubscription<T> extends OperatorContext<T>, Trackable, QueueSubscription<T> {
 
 		@Override
-		Subscriber<? super T> downstream();
+		Subscriber<? super T> actual();
 
 		boolean enter();
 
@@ -1381,7 +1380,7 @@ public final class ReplayProcessor<T> extends FluxProcessor<T, T>
 	}
 
 	static final class ReplayProcessorSubscription<T>
-			implements QueueSubscription<T>, Producer, ReplaySubscription<T>, Receiver {
+			implements QueueSubscription<T>, OperatorContext<T>, ReplaySubscription<T>, Receiver {
 
 		final Subscriber<? super T> actual;
 
@@ -1429,7 +1428,7 @@ public final class ReplayProcessor<T> extends FluxProcessor<T, T>
 		}
 
 		@Override
-		public Subscriber<? super T> downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

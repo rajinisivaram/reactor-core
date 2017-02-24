@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -710,7 +710,7 @@ public class FluxFlatMapTest {
 		try {
 			StepVerifier.create(Flux.just(1).hide().flatMap(f -> Flux.from(s -> {
 				s.onSubscribe(Operators.emptySubscription());
-				Exceptions.terminate(FluxFlatMap.FlatMapMain.ERROR,( (FluxFlatMap.FlatMapInner) s).downstream());
+				Exceptions.terminate(FluxFlatMap.FlatMapMain.ERROR,( (FluxFlatMap.FlatMapInner) s).actual());
 				s.onError(new Exception("test"));
 			})))
 			            .verifyErrorMessage("test");
@@ -991,7 +991,7 @@ public class FluxFlatMapTest {
 			assertThat(((FluxFlatMap.FlatMapMain) s).upstream()).isSameAs(Operators.emptySubscription());
 			assertAfterOnSubscribeState((FluxFlatMap.FlatMapMain) s);
 			s.onNext(1);
-			assertThat(((FluxFlatMap.FlatMapMain) s).downstream()).isNotNull();
+			assertThat(((FluxFlatMap.FlatMapMain) s).actual()).isNotNull();
 			assertThat(((FluxFlatMap.FlatMapMain) s).isCancelled()).isTrue();
 			assertThat(((FluxFlatMap.FlatMapMain) s).isStarted()).isFalse();
 			s.onComplete();
@@ -1001,7 +1001,7 @@ public class FluxFlatMapTest {
 			                        s.onSubscribe(Operators.emptySubscription());
 			                        assertThat(((FluxFlatMap.FlatMapInner) s).upstream()).isEqualTo(
 					                        Operators.emptySubscription());
-			                        assertAfterOnSubscribeInnerState(((FluxFlatMap.FlatMapInner) s).downstream());
+			                        assertAfterOnSubscribeInnerState(((FluxFlatMap.FlatMapInner) s).actual());
 			                        s.onNext(f);
 			                        s.onNext(f);
 			                        assertAfterOnNextInnerState(((FluxFlatMap.FlatMapInner) s));
@@ -1024,7 +1024,7 @@ public class FluxFlatMapTest {
 			assertThat(((FluxFlatMap.FlatMapMain) s).upstream()).isSameAs(Operators.emptySubscription());
 			assertAfterOnSubscribeState((FluxFlatMap.FlatMapMain) s);
 			s.onNext(1);
-			assertThat(((FluxFlatMap.FlatMapMain) s).downstream()).isNotNull();
+			assertThat(((FluxFlatMap.FlatMapMain) s).actual()).isNotNull();
 			assertThat(((FluxFlatMap.FlatMapMain) s).isCancelled()).isFalse();
 			s.onComplete();
 			assertThat(((FluxFlatMap.FlatMapMain) s).isStarted()).isFalse();
@@ -1035,7 +1035,7 @@ public class FluxFlatMapTest {
 			                        s.onSubscribe(Operators.emptySubscription());
 			                        assertThat(((FluxFlatMap.FlatMapInner) s).upstream()).isEqualTo(
 					                        Operators.emptySubscription());
-			                        assertAfterOnSubscribeInnerState(((FluxFlatMap.FlatMapInner) s).downstream());
+			                        assertAfterOnSubscribeInnerState(((FluxFlatMap.FlatMapInner) s).actual());
 			                        s.onNext(f);
 			                        assertAfterOnNextInnerState2(((FluxFlatMap
 					                        .FlatMapInner) s));
@@ -1078,7 +1078,7 @@ public class FluxFlatMapTest {
 						FluxFlatMap.FlatMapMain s = ref.get();
 			            assertThat(s.getPending()).isEqualTo(-1L);
 			            s.onNext(2);
-			            assertThat(s.downstream()).isNotNull();
+			            assertThat(s.actual()).isNotNull();
 			            assertThat(s.isCancelled()).isFalse();
 			            assertThat(s.getPending()).isEqualTo(1);
 			            assertThat(s.isTerminated()).isFalse();

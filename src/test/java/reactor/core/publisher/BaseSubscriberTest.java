@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,9 +21,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
+import reactor.util.Context;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -72,6 +74,62 @@ public class BaseSubscriberTest {
 
 		latch.await(500, TimeUnit.MILLISECONDS);
 		assertThat(lastValue.get(), is(10));
+	}
+
+	@Test
+	public void contextPassing() throws InterruptedException {
+		CountDownLatch latch = new CountDownLatch(1);
+		AtomicInteger lastValue = new AtomicInteger(0);
+		AtomicReference<Context> c = new AtomicReference<>();
+
+		Flux<Integer> intFlux = Flux.range(1, 1000)
+		                            .contextualize((old, next) -> next.put("test", "test"))
+		                            .map(d -> d)
+		                            .distinct()
+		                            .contextualize((old, next) -> next.put("test2", old.get("test")+"_new"));
+		intFlux.subscribe(new BaseSubscriber<Integer>() {
+
+			@Override
+			protected void hookOnContext(Context context) {
+				c.set(context);
+			}
+
+			@Override
+			protected void hookOnSubscribe(Subscription subscription) {
+				request(1);
+			}
+
+			@Override
+			public void hookOnNext(Integer integer) {
+				assertTrue("unexpected previous value for " + integer,
+						lastValue.compareAndSet(integer - 1, integer));
+				if (integer < 10)
+					request(1);
+				else
+					cancel();
+			}
+
+			@Override
+			protected void hookOnComplete() {
+				fail("expected cancellation, not completion");
+			}
+
+			@Override
+			protected void hookOnError(Throwable throwable) {
+				fail("expected cancellation, not error " + throwable);
+			}
+
+			@Override
+			protected void hookFinally(SignalType type) {
+				latch.countDown();
+				assertThat(type, is(SignalType.CANCEL));
+			}
+		});
+
+		latch.await(500, TimeUnit.MILLISECONDS);
+		assertThat(lastValue.get(), is(10));
+		assertThat(c.get().get("test"), Matchers.nullValue());
+		assertThat(c.get().get("test2"), is("test_new"));
 	}
 
 	@Test

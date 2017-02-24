@@ -326,10 +326,10 @@ public class MonoDelayElementTest {
 
 		StepVerifier.withVirtualTime(() -> new MonoDelayElement<>(source, 2, TimeUnit.SECONDS, Schedulers.timer())
 				.doOnSubscribe(s -> {
-					assertThat(s).isInstanceOf(MonoDelayElement.MonoDelayElementSubscriber.class);
+					assertThat(s).isInstanceOf(MonoDelayElement.DelayElementSubscriber.class);
 
-					MonoDelayElement.MonoDelayElementSubscriber delayedSubscriber =
-							(MonoDelayElement.MonoDelayElementSubscriber) s;
+					MonoDelayElement.DelayElementSubscriber delayedSubscriber =
+							(MonoDelayElement.DelayElementSubscriber) s;
 
 					upstream.set(delayedSubscriber.upstream());
 				}))

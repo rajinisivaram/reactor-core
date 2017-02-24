@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import reactor.core.Fuseable;
 import reactor.core.MultiReceiver;
-import reactor.core.Producer;
 import reactor.core.Trackable;
 
 /**
@@ -62,7 +61,7 @@ extends Flux<T>
 	}
 
 	static final class ArraySubscription<T>
-			implements Producer, Trackable, MultiReceiver,
+			implements OperatorContext<T>, Trackable, MultiReceiver,
 			           SynchronousSubscription<T> {
 		final Subscriber<? super T> actual;
 
@@ -180,7 +179,7 @@ extends Flux<T>
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 
@@ -232,7 +231,7 @@ extends Flux<T>
 	}
 
 	static final class ArrayConditionalSubscription<T>
-			implements Producer, Trackable, MultiReceiver,
+			implements OperatorContext<T>, Trackable, MultiReceiver,
 			           SynchronousSubscription<T> {
 		final ConditionalSubscriber<? super T> actual;
 
@@ -355,7 +354,7 @@ extends Flux<T>
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

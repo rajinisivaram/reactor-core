@@ -22,7 +22,6 @@ import java.util.function.Supplier;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 
 /**
@@ -84,7 +83,7 @@ final class FluxPeekStateful<T, S> extends FluxSource<T, T> implements SignalPee
 		source.subscribe(new PeekStatefulSubscriber<>(s, this, stateSeeder.get()));
 	}
 
-	static final class PeekStatefulSubscriber<T, S> implements Subscriber<T>, Subscription, Receiver, Producer {
+	static final class PeekStatefulSubscriber<T, S> implements Subscriber<T>, Subscription, Receiver, OperatorContext<T> {
 
 		final Subscriber<? super T> actual;
 
@@ -238,7 +237,7 @@ final class FluxPeekStateful<T, S> extends FluxSource<T, T> implements SignalPee
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

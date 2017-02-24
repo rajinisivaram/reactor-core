@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
 import reactor.core.MultiProducer;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.util.concurrent.QueueSupplier;
 import reactor.util.concurrent.WaitStrategy;
@@ -50,6 +49,7 @@ abstract class EventLoopProcessor<IN> extends FluxProcessor<IN, IN>
 	/**
 	 * Whether the RingBuffer*Processor can be graphed by wrapping the individual Sequence with the target downstream
 	 */
+	@Deprecated
 	public static final  boolean TRACEABLE_RING_BUFFER_PROCESSOR =
 			Boolean.parseBoolean(System.getProperty("reactor.ringbuffer.trace", "true"));
 
@@ -217,39 +217,6 @@ abstract class EventLoopProcessor<IN> extends FluxProcessor<IN, IN>
 		while (!sequence.compareAndSet(r, u));
 
 		return r;
-	}
-
-	/**
-	 * Wrap a new sequence into a traceable {@link Producer} thus keeping reference and adding an extra stack level
-	 * when
-	 * peeking. Mostly invisible cost but the option is left open. Keeping reference of the arbitrary consumer allows
-	 * expanded operational navigation (graph) by finding all target subscribers of a given ring buffer.
-	 *
-	 * @param init the initial sequence index
-	 * @param delegate the target to proxy
-	 *
-	 * @return a wrapped {@link RingBuffer.Sequence}
-	 */
-	static RingBuffer.Sequence wrap(long init, Object delegate) {
-		if (TRACEABLE_RING_BUFFER_PROCESSOR) {
-			return wrap(RingBuffer.newSequence(init), delegate);
-		}
-		else {
-			return RingBuffer.newSequence(init);
-		}
-	}
-
-	/**
-	 * Wrap a sequence into a traceable {@link Producer} thus keeping reference and adding an extra stack level when
-	 * peeking. Mostly invisible cost but the option is left open.
-	 *
-	 * @param init the sequence reference
-	 * @param delegate the object to wrap
-	 *
-	 * @return a wrapped {@link RingBuffer.Sequence}
-	 */
-	static RingBuffer.Sequence wrap(RingBuffer.Sequence init, Object delegate){
-		return new Wrapped<>(delegate, init);
 	}
 
 	final ExecutorService executor;
@@ -659,56 +626,4 @@ abstract class EventLoopProcessor<IN> extends FluxProcessor<IN, IN>
 			return name;
 		}
 	}
-}
-
-
-final class Wrapped<E> implements RingBuffer.Sequence, Producer {
-
-	public final E                   delegate;
-	public final RingBuffer.Sequence sequence;
-
-	public Wrapped(E delegate, RingBuffer.Sequence sequence) {
-		this.delegate = delegate;
-		this.sequence = sequence;
-	}
-
-	@Override
-	public long getAsLong() {
-		return sequence.getAsLong();
-	}
-
-	@Override
-	public Object downstream() {
-		return delegate;
-	}
-
-	@Override
-	public void set(long value) {
-		sequence.set(value);
-	}
-
-	@Override
-	public boolean compareAndSet(long expectedValue, long newValue) {
-		return sequence.compareAndSet(expectedValue, newValue);
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if(!(o instanceof Wrapped)){
-			return false;
-		}
-		Wrapped<?> wrapped = (Wrapped<?>) o;
-
-		return sequence.equals(wrapped.sequence);
-
-	}
-
-	@Override
-	public int hashCode() {
-		return sequence.hashCode();
-	}
-
 }

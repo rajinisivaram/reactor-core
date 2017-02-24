@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
-import reactor.core.Producer;
 import reactor.util.concurrent.QueueSupplier;
 
 import static reactor.core.publisher.Operators.cancelledSubscription;
@@ -36,7 +35,7 @@ final class MonoSequenceEqual<T> extends Mono<Boolean> {
 	final BiPredicate<? super T, ? super T> comparer;
 	final int                               bufferSize;
 
-	public MonoSequenceEqual(Publisher<? extends T> first, Publisher<? extends T> second,
+	MonoSequenceEqual(Publisher<? extends T> first, Publisher<? extends T> second,
 			BiPredicate<? super T, ? super T> comparer, int bufferSize) {
 		this.first = Objects.requireNonNull(first, "first");
 		this.second = Objects.requireNonNull(second, "second");
@@ -256,7 +255,7 @@ final class MonoSequenceEqual<T> extends Mono<Boolean> {
 	}
 
 	static final class EqualSubscriber<T>
-			implements Subscriber<T>, Producer {
+			implements Subscriber<T> {
 		final EqualCoordinator<T> parent;
 		final Queue<T>            queue;
 		final int                 bufferSize;
@@ -274,11 +273,6 @@ final class MonoSequenceEqual<T> extends Mono<Boolean> {
 			this.parent = parent;
 			this.bufferSize = bufferSize;
 			this.queue = QueueSupplier.<T>get(bufferSize).get();
-		}
-
-		@Override
-		public Object downstream() {
-			return parent;
 		}
 
 		@Override

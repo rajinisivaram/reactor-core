@@ -345,7 +345,9 @@ final class FluxOnAssembly<T> extends FluxSource<T, T> implements Fuseable, Asse
 		return parent;
 	}
 
-	static class OnAssemblySubscriber<T> implements Subscriber<T>, QueueSubscription<T> {
+	static class OnAssemblySubscriber<T> implements Subscriber<T>,
+	                                                OperatorContext<T>,
+	                                                QueueSubscription<T> {
 
 		final AssemblySnapshotException snapshotStack;
 		final Subscriber<? super T>     actual;
@@ -372,6 +374,11 @@ final class FluxOnAssembly<T> extends FluxSource<T, T> implements Fuseable, Asse
 		final public void onError(Throwable t) {
 			fail(t);
 			actual.onError(t);
+		}
+
+		@Override
+		public Subscriber<? super T> actual() {
+			return actual;
 		}
 
 		@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Fuseable;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -38,7 +37,7 @@ final class FluxIterable<T> extends Flux<T> implements Receiver, Fuseable {
 
 	final Iterable<? extends T> iterable;
 
-	public FluxIterable(Iterable<? extends T> iterable) {
+	FluxIterable(Iterable<? extends T> iterable) {
 		this.iterable = Objects.requireNonNull(iterable, "iterable");
 	}
 
@@ -99,7 +98,7 @@ final class FluxIterable<T> extends Flux<T> implements Receiver, Fuseable {
 	}
 
 	static final class IterableSubscription<T>
-			implements Producer, Trackable, SynchronousSubscription<T> {
+			implements OperatorContext<T>, Trackable, SynchronousSubscription<T> {
 
 		final Subscriber<? super T> actual;
 
@@ -292,7 +291,7 @@ final class FluxIterable<T> extends Flux<T> implements Receiver, Fuseable {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 
@@ -353,7 +352,7 @@ final class FluxIterable<T> extends Flux<T> implements Receiver, Fuseable {
 	}
 
 	static final class IterableSubscriptionConditional<T>
-			implements Producer, Trackable, Subscription, SynchronousSubscription<T> {
+			implements OperatorContext<T>, Trackable, Subscription, SynchronousSubscription<T> {
 
 		final ConditionalSubscriber<? super T> actual;
 
@@ -548,7 +547,7 @@ final class FluxIterable<T> extends Flux<T> implements Receiver, Fuseable {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

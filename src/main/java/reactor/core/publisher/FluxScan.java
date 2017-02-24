@@ -20,8 +20,6 @@ import java.util.function.BiFunction;
 
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import reactor.core.Loopback;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -58,7 +56,7 @@ final class FluxScan<T> extends FluxSource<T, T> {
 	}
 
 	static final class ScanSubscriber<T>
-			implements Subscriber<T>, Receiver, Producer, Loopback, Subscription,
+			implements Subscriber<T>, Receiver, OperatorContext<T>, Subscription,
 			           Trackable {
 		final Subscriber<? super T> actual;
 
@@ -137,18 +135,8 @@ final class FluxScan<T> extends FluxSource<T, T> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return accumulator;
-		}
-
-		@Override
-		public Object connectedOutput() {
-			return value;
 		}
 
 		@Override

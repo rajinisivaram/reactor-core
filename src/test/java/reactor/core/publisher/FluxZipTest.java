@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1278,7 +1278,7 @@ public class FluxZipTest extends FluxOperatorTest<String, String> {
 		assertThat(s.getPending()).isEqualTo(-1L);
 		assertThat(s.limit()).isEqualTo(93);
 		assertThat(s.expectedFromUpstream()).isEqualTo(0);
-		assertThat(s.downstream()).isNull();
+		assertThat(s.actual()).isNull();
 		assertThat(s.isCancelled()).isFalse();
 	}
 
@@ -1294,7 +1294,7 @@ public class FluxZipTest extends FluxOperatorTest<String, String> {
 		assertThat(s.getPending()).isEqualTo(1);
 		assertThat(s.limit()).isEqualTo(93);
 		assertThat(s.expectedFromUpstream()).isEqualTo(0);
-		assertThat(s.downstream()).isNull();
+		assertThat(s.actual()).isNull();
 		assertThat(s.isCancelled()).isFalse();
 	}
 

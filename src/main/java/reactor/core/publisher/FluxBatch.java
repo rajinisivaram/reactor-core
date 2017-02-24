@@ -57,7 +57,7 @@ abstract class FluxBatch<T, V> extends FluxSource<T, V> {
 		return Operators.serialize(actual);
 	}
 
-	static abstract class BatchAction<T, V> extends Operators.SubscriberAdapter<T, V> {
+	static abstract class BatchSubscriber<T, V> extends Operators.SubscriberAdapter<T, V> {
 
 		@SuppressWarnings("ThrowableInstanceNeverThrown")
 		static final Exception FAILED_SATE             =
@@ -70,6 +70,7 @@ abstract class FluxBatch<T, V> extends FluxSource<T, V> {
 						return null;
 					}
 				};
+
 		final static int NOT_TERMINATED          = 0;
 		final static int TERMINATED_WITH_SUCCESS = 1;
 		final static int TERMINATED_WITH_ERROR   = 2;
@@ -81,27 +82,27 @@ abstract class FluxBatch<T, V> extends FluxSource<T, V> {
 		final TimedScheduler.TimedWorker timer;
 		final Runnable                   flushTask;
 
-		volatile int                                    terminated =
+		volatile int                                                terminated =
 				NOT_TERMINATED;
 		@SuppressWarnings("rawtypes")
-		static final     AtomicIntegerFieldUpdater<BatchAction> TERMINATED =
-				AtomicIntegerFieldUpdater.newUpdater(BatchAction.class, "terminated");
+		static final     AtomicIntegerFieldUpdater<BatchSubscriber> TERMINATED =
+				AtomicIntegerFieldUpdater.newUpdater(BatchSubscriber.class, "terminated");
 
 
 		volatile long requested;
 
 		@SuppressWarnings("rawtypes")
-		static final AtomicLongFieldUpdater<BatchAction> REQUESTED =
-				AtomicLongFieldUpdater.newUpdater(BatchAction.class, "requested");
+		static final AtomicLongFieldUpdater<BatchSubscriber> REQUESTED =
+				AtomicLongFieldUpdater.newUpdater(BatchSubscriber.class, "requested");
 
 		volatile int index = 0;
 
-		static final     AtomicIntegerFieldUpdater<BatchAction> INDEX =
-				AtomicIntegerFieldUpdater.newUpdater(BatchAction.class, "index");
+		static final     AtomicIntegerFieldUpdater<BatchSubscriber> INDEX =
+				AtomicIntegerFieldUpdater.newUpdater(BatchSubscriber.class, "index");
 
 		volatile Cancellation timespanRegistration;
 
-		public BatchAction(Subscriber<? super V> actual,
+		public BatchSubscriber(Subscriber<? super V> actual,
 				int batchSize,
 				boolean first,
 				long timespan,

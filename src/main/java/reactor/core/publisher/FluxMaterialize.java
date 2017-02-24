@@ -40,7 +40,7 @@ final class FluxMaterialize<T> extends FluxSource<T, Signal<T>> {
 
 	final static class MaterializeSubscriber<T>
 	extends AbstractQueue<Signal<T>>
-	implements Subscriber<T>, Subscription, BooleanSupplier {
+	implements Subscriber<T>, OperatorContext<Signal<T>>, Subscription, BooleanSupplier {
 	    
 	    final Subscriber<? super Signal<T>> actual;
 
@@ -62,14 +62,19 @@ final class FluxMaterialize<T> extends FluxSource<T, Signal<T>> {
 		}
 
 		@Override
+		public Subscriber<? super Signal<T>> actual() {
+			return actual;
+		}
+
+		@Override
 		public void onSubscribe(Subscription s) {
 		    if (Operators.validate(this.s, s)) {
 		        this.s = s;
-		        
+
 		        actual.onSubscribe(this);
 		    }
 		}
-		
+
 		@Override
 		public void onNext(T ev) {
 			if(terminalSignal != null){

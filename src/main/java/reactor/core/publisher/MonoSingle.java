@@ -69,7 +69,7 @@ final class MonoSingle<T> extends MonoSource<T, T> implements Fuseable {
 
 		boolean done;
 
-		public SingleSubscriber(Subscriber<? super T> actual,
+		SingleSubscriber(Subscriber<? super T> actual,
 				T defaultValue,
 				boolean completeOnEmpty) {
 			super(actual);

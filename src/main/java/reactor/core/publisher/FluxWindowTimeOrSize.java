@@ -18,12 +18,10 @@ package reactor.core.publisher;
 
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import reactor.core.Loopback;
-import reactor.core.Producer;
 import reactor.core.scheduler.TimedScheduler;
 
 /**
- * WindowAction is forwarding events on a steam until {@code backlog} is reached, after that streams collected events
+ * WindowTimeoutSubscriber is forwarding events on a steam until {@code backlog} is reached, after that streams collected events
  * further, complete it and create a fresh new fluxion.
  * @author Stephane Maldini
  */
@@ -35,17 +33,17 @@ final class FluxWindowTimeOrSize<T> extends FluxBatch<T, Flux<T>> {
 
 	@Override
 	public void subscribe(Subscriber<? super Flux<T>> subscriber) {
-		source.subscribe(new WindowAction<>(prepareSub(subscriber), batchSize, timespan, timer));
+		source.subscribe(new WindowTimeoutSubscriber<>(prepareSub(subscriber), batchSize, timespan, timer));
 	}
 
-	final static class Window<T> extends Flux<T> implements Subscriber<T>, Subscription, Producer {
+	final static class Window<T> extends Flux<T> implements Subscriber<T>, Subscription, OperatorContext<T> {
 
 		final protected UnicastProcessor<T> processor;
 		final protected TimedScheduler      timer;
 
 		protected int count = 0;
 
-		public Window(TimedScheduler timer) {
+		Window(TimedScheduler timer) {
 			this.processor = UnicastProcessor.create();
 			this.timer = timer;
 		}
@@ -87,18 +85,18 @@ final class FluxWindowTimeOrSize<T> extends FluxBatch<T, Flux<T>> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return processor;
 		}
 	}
 
-	final static class WindowAction<T> extends BatchAction<T, Flux<T>> implements Loopback {
+	final static class WindowTimeoutSubscriber<T> extends BatchSubscriber<T, Flux<T>> {
 
-		private final TimedScheduler timer;
+		final TimedScheduler timer;
 
-		private Window<T> currentWindow;
+		Window<T> currentWindow;
 
-		public WindowAction(Subscriber<? super Flux<T>> actual,
+		WindowTimeoutSubscriber(Subscriber<? super Flux<T>> actual,
 				int backlog,
 				long timespan,
 				TimedScheduler timer) {
@@ -107,7 +105,7 @@ final class FluxWindowTimeOrSize<T> extends FluxBatch<T, Flux<T>> {
 			this.timer = timer;
 		}
 
-		protected Flux<T> createWindowStream() {
+		Flux<T> createWindowStream() {
 			Window<T> _currentWindow = new Window<>(timer);
 			_currentWindow.onSubscribe(new Subscription(){
 
@@ -166,10 +164,6 @@ final class FluxWindowTimeOrSize<T> extends FluxBatch<T, Flux<T>> {
 			}
 		}
 
-		@Override
-		public Object connectedInput() {
-			return currentWindow;
-		}
 	}
 
 

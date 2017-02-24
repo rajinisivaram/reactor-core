@@ -22,7 +22,6 @@ import org.reactivestreams.Subscription;
 import reactor.core.Fuseable;
 import reactor.core.Fuseable.ConditionalSubscriber;
 import reactor.core.Fuseable.QueueSubscription;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -65,7 +64,7 @@ final class FluxTake<T> extends FluxSource<T, T> {
 	}
 
 	static final class TakeSubscriber<T>
-			implements Subscriber<T>, Subscription, Receiver, Producer, Trackable {
+			implements Subscriber<T>, Subscription, Receiver, OperatorContext<T>, Trackable {
 
 		final Subscriber<? super T> actual;
 
@@ -189,7 +188,7 @@ final class FluxTake<T> extends FluxSource<T, T> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 
@@ -200,7 +199,7 @@ final class FluxTake<T> extends FluxSource<T, T> {
 	}
 
 	static final class TakeConditionalSubscriber<T>
-			implements ConditionalSubscriber<T>, Subscription, Receiver, Producer,
+			implements ConditionalSubscriber<T>, Subscription, Receiver, OperatorContext<T>,
 			           Trackable {
 
 		final ConditionalSubscriber<? super T> actual;
@@ -356,7 +355,7 @@ final class FluxTake<T> extends FluxSource<T, T> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 
@@ -367,7 +366,7 @@ final class FluxTake<T> extends FluxSource<T, T> {
 	}
 
 	static final class TakeFuseableSubscriber<T>
-			implements Subscriber<T>, QueueSubscription<T>, Receiver, Producer,
+			implements Subscriber<T>, QueueSubscription<T>, Receiver, OperatorContext<T>,
 			           Trackable {
 
 		final Subscriber<? super T> actual;
@@ -504,7 +503,7 @@ final class FluxTake<T> extends FluxSource<T, T> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

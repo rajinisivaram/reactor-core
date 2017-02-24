@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -566,7 +566,7 @@ public class ReplayProcessorTest {
 				((Iterator<ReplayProcessor.ReplayProcessorSubscription>)rp
 						.downstreams()).next();
 
-		assertThat(d1).isEqualTo(s.downstream());
+		assertThat(d1).isEqualTo(s.actual());
 
 		assertThat(s.isEmpty()).isTrue();
 		assertThat(s.isCancelled()).isFalse();

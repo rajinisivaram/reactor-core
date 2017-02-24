@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import org.reactivestreams.Subscription;
 import reactor.core.Disposable;
 import reactor.core.Fuseable;
 import reactor.core.MultiProducer;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 import reactor.core.scheduler.TimedScheduler;
@@ -42,7 +41,7 @@ import reactor.util.concurrent.QueueSupplier;
  * @see <a href="https://github.com/reactor/reactive-streams-commons">Reactive-Streams-Commons</a>
  */
 final class FluxReplay<T> extends ConnectableFlux<T>
-		implements Producer, Fuseable {
+		implements OperatorContext<T>, Fuseable {
 
 	final Publisher<T>   source;
 	final int            history;
@@ -78,7 +77,7 @@ final class FluxReplay<T> extends ConnectableFlux<T>
 	}
 
 	@Override
-	public Object downstream() {
+	public Subscriber<? super T> actual() {
 		return connection;
 	}
 
@@ -492,7 +491,7 @@ final class FluxReplay<T> extends ConnectableFlux<T>
 		}
 
 		@Override
-		public Subscriber<? super T> downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,11 @@
 package reactor.core.publisher;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
 import reactor.core.Fuseable;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 import reactor.test.StepVerifier;
@@ -427,7 +425,6 @@ public class FluxTakeTest {
 		assertThat(t.limit()).isEqualTo(0);
 		assertThat(t.getCapacity()).isEqualTo(2);
 		assertThat(t.expectedFromUpstream()).isEqualTo(2);
-		assertThat(((Producer)t).downstream()).isNotNull();
 	}
 
 	void assertTrackableAfterOnSubscribe(Trackable t){

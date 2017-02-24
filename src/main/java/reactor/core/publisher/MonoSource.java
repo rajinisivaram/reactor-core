@@ -62,24 +62,6 @@ public class MonoSource<I, O> extends Mono<O> implements Receiver{
 	}
 
 	/**
-	 * Build a {@link MonoSource} wrapper around the passed parent {@link Mono}
-	 *
-	 * @param source the {@link Mono} to decorate
-	 */
-	protected MonoSource(Mono<? extends I> source) {
-		this.source = Objects.requireNonNull(source);
-	}
-
-	/**
-	 * Build a {@link MonoSource} wrapper around the passed parent {@link Flux}
-	 *
-	 * @param source the {@link Flux} to decorate
-	 */
-	protected MonoSource(Flux<? extends I> source) {
-		this.source = Objects.requireNonNull(source);
-	}
-
-	/**
 	 * Default is simply delegating and decorating with {@link Mono} API. Note this
 	 * assumes an identity between input and output types.
 	 */

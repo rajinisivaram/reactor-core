@@ -40,11 +40,11 @@ final class MonoPublishOn<T> extends MonoSource<T, T> {
 
 	@Override
 	public void subscribe(Subscriber<? super T> s) {
-		source.subscribe(new MonoPublishOnSubscriber<T>(s, scheduler));
+		source.subscribe(new PublishOnSubscriber<T>(s, scheduler));
 	}
 
-	static final class MonoPublishOnSubscriber<T>
-			implements Subscriber<T>, Subscription, Runnable {
+	static final class PublishOnSubscriber<T>
+			implements Subscriber<T>, OperatorContext<T>, Subscription, Runnable {
 
 		final Subscriber<? super T> actual;
 
@@ -54,19 +54,24 @@ final class MonoPublishOn<T> extends MonoSource<T, T> {
 
 		volatile Cancellation future;
 		@SuppressWarnings("rawtypes")
-		static final AtomicReferenceFieldUpdater<MonoPublishOnSubscriber, Cancellation>
+		static final AtomicReferenceFieldUpdater<PublishOnSubscriber, Cancellation>
 				FUTURE =
-				AtomicReferenceFieldUpdater.newUpdater(MonoPublishOnSubscriber.class,
+				AtomicReferenceFieldUpdater.newUpdater(PublishOnSubscriber.class,
 						Cancellation.class,
 						"future");
 
 		T         value;
 		Throwable error;
 
-		public MonoPublishOnSubscriber(Subscriber<? super T> actual,
+		PublishOnSubscriber(Subscriber<? super T> actual,
 				Scheduler scheduler) {
 			this.actual = actual;
 			this.scheduler = scheduler;
+		}
+
+		@Override
+		public Subscriber<? super T> actual() {
+			return actual;
 		}
 
 		@Override

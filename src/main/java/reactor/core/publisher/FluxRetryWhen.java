@@ -22,7 +22,6 @@ import java.util.function.Function;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import reactor.core.Loopback;
 
 /**
  * retries a source when a companion sequence signals
@@ -186,7 +185,7 @@ final class FluxRetryWhen<T> extends FluxSource<T, T> {
 	}
 
 	static final class RetryWhenOtherSubscriber extends Flux<Throwable>
-	implements Subscriber<Object>, Loopback {
+	implements Subscriber<Object> {
 		RetryWhenMainSubscriber<?> main;
 
 		final DirectProcessor<Throwable> completionSignal = new DirectProcessor<>();
@@ -214,16 +213,6 @@ final class FluxRetryWhen<T> extends FluxSource<T, T> {
 		@Override
 		public void subscribe(Subscriber<? super Throwable> s) {
 			completionSignal.subscribe(s);
-		}
-
-		@Override
-		public Object connectedInput() {
-			return main;
-		}
-
-		@Override
-		public Object connectedOutput() {
-			return completionSignal;
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,9 @@ import reactor.core.Trackable;
 final class FluxNever 
 extends Flux<Object> implements Trackable {
 
-	private static final Publisher<Object> INSTANCE = new FluxNever();
+	static final Publisher<Object> INSTANCE = new FluxNever();
 
-	private FluxNever() {
+	FluxNever() {
 		// deliberately no op
 	}
 
@@ -48,7 +48,7 @@ extends Flux<Object> implements Trackable {
 	 * @return a properly parametrized instance of this never Publisher
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> Flux<T> instance() {
+	static <T> Flux<T> instance() {
 		return (Flux<T>) INSTANCE;
 	}
 

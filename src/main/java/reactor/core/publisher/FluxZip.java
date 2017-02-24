@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,6 @@ import reactor.core.Disposable;
 import reactor.core.Exceptions;
 import reactor.core.Fuseable;
 import reactor.core.MultiReceiver;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -838,7 +837,7 @@ final class FluxZip<T, R> extends Flux<R> implements MultiReceiver, Trackable {
 	}
 
 	static final class ZipInner<T>
-			implements Subscriber<T>, Receiver, Producer, Trackable {
+			implements Subscriber<T>, Receiver, OperatorContext<T>, Trackable {
 
 		final ZipCoordinator<T, ?> parent;
 
@@ -979,7 +978,7 @@ final class FluxZip<T, R> extends Flux<R> implements MultiReceiver, Trackable {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return null;
 		}
 

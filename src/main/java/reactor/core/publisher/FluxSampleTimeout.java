@@ -70,7 +70,9 @@ final class FluxSampleTimeout<T, U> extends FluxSource<T, T> {
 		source.subscribe(main);
 	}
 
-	static final class ThrottleTimeoutMain<T, U> implements Subscriber<T>, Subscription {
+	static final class ThrottleTimeoutMain<T, U> implements Subscriber<T>,
+	                                                        OperatorContext<T>,
+			Subscription {
 
 		final Subscriber<? super T> actual;
 
@@ -118,12 +120,17 @@ final class FluxSampleTimeout<T, U> extends FluxSource<T, T> {
 		static final AtomicLongFieldUpdater<ThrottleTimeoutMain> INDEX =
 				AtomicLongFieldUpdater.newUpdater(ThrottleTimeoutMain.class, "index");
 
-		public ThrottleTimeoutMain(Subscriber<? super T> actual,
+		ThrottleTimeoutMain(Subscriber<? super T> actual,
 				Function<? super T, ? extends Publisher<U>> throttler,
 				Queue<ThrottleTimeoutOther<T, U>> queue) {
 			this.actual = actual;
 			this.throttler = throttler;
 			this.queue = queue;
+		}
+
+		@Override
+		public Subscriber<? super T> actual() {
+			return actual;
 		}
 
 		@Override

@@ -23,8 +23,6 @@ import java.util.function.Supplier;
 
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import reactor.core.Loopback;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -79,7 +77,7 @@ final class FluxScanSeed<T, R> extends FluxSource<T, R> {
 	}
 
 	static final class ScanSeedSubscriber<T, R>
-			implements Subscriber<T>, Subscription, Producer, Receiver, Loopback,
+			implements Subscriber<T>, Subscription, OperatorContext<R>, Receiver,
 			           Trackable {
 
 		final Subscriber<? super R> actual;
@@ -238,13 +236,8 @@ final class FluxScanSeed<T, R> extends FluxSource<T, R> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super R> actual() {
 			return actual;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return accumulator;
 		}
 
 		@Override

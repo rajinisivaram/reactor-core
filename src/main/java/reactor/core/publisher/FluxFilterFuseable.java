@@ -22,8 +22,6 @@ import java.util.function.Predicate;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Fuseable;
-import reactor.core.Loopback;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -55,7 +53,7 @@ final class FluxFilterFuseable<T> extends FluxSource<T, T> implements Fuseable {
 	}
 
 	static final class FilterFuseableSubscriber<T>
-			implements Receiver, Producer, Loopback, SynchronousSubscription<T>,
+			implements Receiver, OperatorContext<T>, SynchronousSubscription<T>,
 			           ConditionalSubscriber<T>, Trackable {
 
 		final Subscriber<? super T> actual;
@@ -68,7 +66,7 @@ final class FluxFilterFuseable<T> extends FluxSource<T, T> implements Fuseable {
 
 		int sourceMode;
 
-		public FilterFuseableSubscriber(Subscriber<? super T> actual,
+		FilterFuseableSubscriber(Subscriber<? super T> actual,
 				Predicate<? super T> predicate) {
 			this.actual = actual;
 			this.predicate = predicate;
@@ -165,13 +163,8 @@ final class FluxFilterFuseable<T> extends FluxSource<T, T> implements Fuseable {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return predicate;
 		}
 
 		@Override
@@ -246,7 +239,7 @@ final class FluxFilterFuseable<T> extends FluxSource<T, T> implements Fuseable {
 	}
 
 	static final class FilterFuseableConditionalSubscriber<T>
-			implements Receiver, Producer, Loopback, ConditionalSubscriber<T>,
+			implements Receiver, OperatorContext<T>, ConditionalSubscriber<T>,
 			           SynchronousSubscription<T>, Trackable {
 
 		final ConditionalSubscriber<? super T> actual;
@@ -259,7 +252,7 @@ final class FluxFilterFuseable<T> extends FluxSource<T, T> implements Fuseable {
 
 		int sourceMode;
 
-		public FilterFuseableConditionalSubscriber(ConditionalSubscriber<? super T> actual,
+		FilterFuseableConditionalSubscriber(ConditionalSubscriber<? super T> actual,
 				Predicate<? super T> predicate) {
 			this.actual = actual;
 			this.predicate = predicate;
@@ -352,13 +345,8 @@ final class FluxFilterFuseable<T> extends FluxSource<T, T> implements Fuseable {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return predicate;
 		}
 
 		@Override

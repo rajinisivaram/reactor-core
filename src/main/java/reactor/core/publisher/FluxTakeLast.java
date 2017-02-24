@@ -21,7 +21,6 @@ import java.util.function.BooleanSupplier;
 
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -58,7 +57,7 @@ final class FluxTakeLast<T> extends FluxSource<T, T> {
 		return Integer.MAX_VALUE;
 	}
 
-	static final class TakeLastZeroSubscriber<T> implements Subscriber<T>, Producer, Subscription,
+	static final class TakeLastZeroSubscriber<T> implements Subscriber<T>, OperatorContext<T>, Subscription,
 																	 Receiver {
 
 		final Subscriber<? super T> actual;
@@ -96,7 +95,7 @@ final class FluxTakeLast<T> extends FluxSource<T, T> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 		
@@ -118,7 +117,7 @@ final class FluxTakeLast<T> extends FluxSource<T, T> {
 
 	static final class TakeLastManySubscriber<T>
 			extends ArrayDeque<T>
-			implements Subscriber<T>, BooleanSupplier, Producer,
+			implements Subscriber<T>, BooleanSupplier, OperatorContext<T>,
 			           Trackable, Subscription, Receiver {
 
 		final Subscriber<? super T> actual;
@@ -208,7 +207,7 @@ final class FluxTakeLast<T> extends FluxSource<T, T> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 	}

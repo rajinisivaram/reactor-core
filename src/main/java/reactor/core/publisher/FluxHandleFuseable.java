@@ -23,8 +23,6 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
 import reactor.core.Fuseable;
-import reactor.core.Loopback;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -69,7 +67,7 @@ final class FluxHandleFuseable<T, R> extends FluxSource<T, R> implements Fuseabl
 	}
 
 	static final class HandleFuseableSubscriber<T, R>
-			implements Subscriber<T>, Receiver, Producer, Loopback, Subscription,
+			implements Subscriber<T>, Receiver, OperatorContext<R>, Subscription,
 			           ConditionalSubscriber<T>, SynchronousSubscription<R>, Trackable,
 			           SynchronousSink<R> {
 
@@ -200,13 +198,8 @@ final class FluxHandleFuseable<T, R> extends FluxSource<T, R> implements Fuseabl
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super R> actual() {
 			return actual;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return handler;
 		}
 
 		@Override
@@ -343,7 +336,7 @@ final class FluxHandleFuseable<T, R> extends FluxSource<T, R> implements Fuseabl
 	}
 
 	static final class HandleFuseableConditionalSubscriber<T, R>
-			implements ConditionalSubscriber<T>, Receiver, Producer, Loopback,
+			implements ConditionalSubscriber<T>, Receiver, OperatorContext<R>,
 			           SynchronousSubscription<R>, Trackable, SynchronousSink<R> {
 
 		final ConditionalSubscriber<? super R>          actual;
@@ -499,13 +492,8 @@ final class FluxHandleFuseable<T, R> extends FluxSource<T, R> implements Fuseabl
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super R> actual() {
 			return actual;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return handler;
 		}
 
 		@Override

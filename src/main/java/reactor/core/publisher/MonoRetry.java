@@ -30,7 +30,7 @@ final class MonoRetry<T> extends MonoSource<T, T> {
 
 	final long times;
 
-	public MonoRetry(Mono<? extends T> source, long times) {
+	MonoRetry(Mono<? extends T> source, long times) {
 		super(source);
 		if (times < 0L) {
 			throw new IllegalArgumentException("times >= 0 required");

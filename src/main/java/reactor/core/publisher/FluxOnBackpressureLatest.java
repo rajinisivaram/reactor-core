@@ -21,7 +21,6 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -49,7 +48,7 @@ final class FluxOnBackpressureLatest<T> extends FluxSource<T, T> {
 	}
 
 	static final class LatestSubscriber<T>
-			implements Subscriber<T>, Subscription, Trackable, Producer, Receiver {
+			implements Subscriber<T>, Subscription, Trackable, OperatorContext<T>, Receiver {
 
 		final Subscriber<? super T> actual;
 
@@ -223,7 +222,7 @@ final class FluxOnBackpressureLatest<T> extends FluxSource<T, T> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

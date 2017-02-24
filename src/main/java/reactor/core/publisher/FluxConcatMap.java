@@ -51,7 +51,7 @@ final class FluxConcatMap<T, R> extends FluxSource<T, R> {
 	/**
 	 * Indicates when an error from the main source should be reported.
 	 */
-	public enum ErrorMode {
+	enum ErrorMode {
 		/**
 		 * Report the error immediately, cancelling the active inner source.
 		 */
@@ -64,7 +64,7 @@ final class FluxConcatMap<T, R> extends FluxSource<T, R> {
 		END
 	}
 
-	public static <T, R> Subscriber<T> subscriber(Subscriber<? super R> s,
+	static <T, R> Subscriber<T> subscriber(Subscriber<? super R> s,
 			Function<? super T, ? extends Publisher<? extends R>> mapper,
 			Supplier<? extends Queue<T>> queueSupplier,
 			int prefetch,
@@ -82,21 +82,6 @@ final class FluxConcatMap<T, R> extends FluxSource<T, R> {
 				parent = new ConcatMapImmediate<>(s, mapper, queueSupplier, prefetch);
 		}
 		return parent;
-	}
-
-	FluxConcatMap(Flux<? extends T> source,
-			Function<? super T, ? extends Publisher<? extends R>> mapper,
-			Supplier<? extends Queue<T>> queueSupplier,
-			int prefetch,
-			ErrorMode errorMode) {
-		super(source);
-		if (prefetch <= 0) {
-			throw new IllegalArgumentException("prefetch > 0 required but it was " + prefetch);
-		}
-		this.mapper = Objects.requireNonNull(mapper, "mapper");
-		this.queueSupplier = Objects.requireNonNull(queueSupplier, "queueSupplier");
-		this.prefetch = prefetch;
-		this.errorMode = Objects.requireNonNull(errorMode, "errorMode");
 	}
 
 	FluxConcatMap(Publisher<? extends T> source,
@@ -142,7 +127,8 @@ final class FluxConcatMap<T, R> extends FluxSource<T, R> {
 	}
 
 	static final class ConcatMapImmediate<T, R>
-			implements Subscriber<T>, FluxConcatMapSupport<R>, Subscription {
+			implements Subscriber<T>, OperatorContext<R>, FluxConcatMapSupport<R>,
+			Subscription {
 
 		final Subscriber<? super R> actual;
 
@@ -310,6 +296,11 @@ final class FluxConcatMap<T, R> extends FluxSource<T, R> {
 		}
 
 		@Override
+		public Subscriber<? super R> actual() {
+			return actual;
+		}
+
+		@Override
 		public void request(long n) {
 			inner.request(n);
 		}
@@ -454,7 +445,7 @@ final class FluxConcatMap<T, R> extends FluxSource<T, R> {
 	}
 
 	static final class ConcatMapDelayed<T, R>
-			implements Subscriber<T>, FluxConcatMapSupport<R>, Subscription {
+			implements Subscriber<T>, OperatorContext<R>, FluxConcatMapSupport<R>, Subscription {
 
 		final Subscriber<? super R> actual;
 
@@ -496,7 +487,7 @@ final class FluxConcatMap<T, R> extends FluxSource<T, R> {
 
 		int sourceMode;
 
-		public ConcatMapDelayed(Subscriber<? super R> actual,
+		ConcatMapDelayed(Subscriber<? super R> actual,
 				Function<? super T, ? extends Publisher<? extends R>> mapper,
 				Supplier<? extends Queue<T>> queueSupplier,
 				int prefetch,
@@ -508,6 +499,11 @@ final class FluxConcatMap<T, R> extends FluxSource<T, R> {
 			this.limit = prefetch - (prefetch >> 2);
 			this.veryEnd = veryEnd;
 			this.inner = new ConcatMapInner<>(this);
+		}
+
+		@Override
+		public Subscriber<? super R> actual() {
+			return actual;
 		}
 
 		@Override

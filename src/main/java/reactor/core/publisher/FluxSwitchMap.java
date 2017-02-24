@@ -50,7 +50,7 @@ final class FluxSwitchMap<T, R> extends FluxSource<T, R> {
 	static final SwitchMapInner<Object> CANCELLED_INNER =
 			new SwitchMapInner<>(null, 0, Long.MAX_VALUE);
 
-	FluxSwitchMap(Flux<? extends T> source,
+	FluxSwitchMap(Publisher<? extends T> source,
 			Function<? super T, ? extends Publisher<? extends R>> mapper,
 			Supplier<? extends Queue<Object>> queueSupplier,
 			int bufferSize) {
@@ -80,7 +80,9 @@ final class FluxSwitchMap<T, R> extends FluxSource<T, R> {
 				bufferSize));
 	}
 
-	static final class SwitchMapMain<T, R> implements Subscriber<T>, Subscription {
+	static final class SwitchMapMain<T, R> implements Subscriber<T>,
+	                                                  OperatorContext<R>,
+	                                                  Subscription {
 
 		final Subscriber<? super R> actual;
 
@@ -153,6 +155,11 @@ final class FluxSwitchMap<T, R> extends FluxSource<T, R> {
 			else {
 				this.queueBiAtomic = null;
 			}
+		}
+
+		@Override
+		public Subscriber<? super R> actual() {
+			return actual;
 		}
 
 		@Override

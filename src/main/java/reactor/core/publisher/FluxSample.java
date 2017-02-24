@@ -69,7 +69,7 @@ final class FluxSample<T, U> extends FluxSource<T, T> {
 	}
 
 	static final class SampleMainSubscriber<T>
-	  implements Subscriber<T>, Subscription {
+	  implements Subscriber<T>, OperatorContext<T>, Subscription {
 
 		final Subscriber<? super T> actual;
 
@@ -94,7 +94,7 @@ final class FluxSample<T, U> extends FluxSource<T, T> {
 		static final AtomicLongFieldUpdater<SampleMainSubscriber> REQUESTED =
 		  AtomicLongFieldUpdater.newUpdater(SampleMainSubscriber.class, "requested");
 
-		public SampleMainSubscriber(Subscriber<? super T> actual) {
+		SampleMainSubscriber(Subscriber<? super T> actual) {
 			this.actual = actual;
 		}
 
@@ -173,6 +173,11 @@ final class FluxSample<T, U> extends FluxSource<T, T> {
 			actual.onComplete();
 		}
 
+		@Override
+		public Subscriber<? super T> actual() {
+			return actual;
+		}
+
 		@SuppressWarnings("unchecked")
 		T getAndNullValue() {
 			return (T) VALUE.getAndSet(this, null);
@@ -186,7 +191,7 @@ final class FluxSample<T, U> extends FluxSource<T, T> {
 	static final class SampleOtherSubscriber<T, U> implements Subscriber<U> {
 		final SampleMainSubscriber<T> main;
 
-		public SampleOtherSubscriber(SampleMainSubscriber<T> main) {
+		SampleOtherSubscriber(SampleMainSubscriber<T> main) {
 			this.main = main;
 		}
 

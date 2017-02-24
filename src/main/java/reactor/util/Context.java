@@ -13,26 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package reactor.core;
+package reactor.util;
 
 /**
- * A component that is forking to a sub-flow given a delegate input and that is consuming from a given delegate output
+ * @author Stephane Maldini
  */
-@Deprecated
-public interface Loopback {
+public interface Context {
 
-	/**
-	 * @return component delegated to for incoming data or {@code null} if unavailable
-	 */
-	default Object connectedInput() {
-		return null;
-	}
+	Context put(Object key, Object value);
 
-	/**
-	 * @return component delegated to for outgoing data or {@code null} if unavailable
-	 */
-	default Object connectedOutput() {
-		return null;
-	}
+	<T> T get(Object key);
 }

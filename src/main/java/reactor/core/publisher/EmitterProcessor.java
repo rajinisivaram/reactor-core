@@ -25,7 +25,6 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.MultiProducer;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 import reactor.core.Exceptions;
@@ -619,7 +618,7 @@ public final class EmitterProcessor<T> extends FluxProcessor<T, T>
 	}
 
 	static final class EmitterSubscriber<T>
-			implements Subscription, Trackable, Receiver, Producer {
+			implements Subscription, Trackable, Receiver, OperatorContext<T> {
 
 		public static final long MASK_NOT_SUBSCRIBED = Long.MIN_VALUE;
 		final EmitterProcessor<T>   parent;
@@ -718,7 +717,7 @@ public final class EmitterProcessor<T> extends FluxProcessor<T, T>
 		}
 
 		@Override
-		public Subscriber<? super T> downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 	}

@@ -22,7 +22,6 @@ import java.util.function.BiFunction;
 
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -81,7 +80,7 @@ final class FluxZipIterable<T, U, R> extends FluxSource<T, R> {
 	}
 
 	static final class ZipSubscriber<T, U, R>
-			implements Subscriber<T>, Producer, Receiver, Subscription,
+			implements Subscriber<T>, OperatorContext<R>, Receiver, Subscription,
 			           Trackable {
 
 		final Subscriber<? super R> actual;
@@ -190,7 +189,7 @@ final class FluxZipIterable<T, U, R> extends FluxSource<T, R> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super R> actual() {
 			return actual;
 		}
 

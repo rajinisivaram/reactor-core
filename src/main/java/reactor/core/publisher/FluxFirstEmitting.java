@@ -25,8 +25,8 @@ import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.MultiReceiver;
-import reactor.core.Producer;
 import reactor.core.Trackable;
+import reactor.util.Context;
 
 /**
  * Given a set of source Publishers the values of that Publisher is forwarded to the
@@ -43,12 +43,12 @@ final class FluxFirstEmitting<T> extends Flux<T> implements MultiReceiver {
 	final Iterable<? extends Publisher<? extends T>> iterable;
 
 	@SafeVarargs
-	public FluxFirstEmitting(Publisher<? extends T>... array) {
+	FluxFirstEmitting(Publisher<? extends T>... array) {
 		this.array = Objects.requireNonNull(array, "array");
 		this.iterable = null;
 	}
 
-	public FluxFirstEmitting(Iterable<? extends Publisher<? extends T>> iterable) {
+	FluxFirstEmitting(Iterable<? extends Publisher<? extends T>> iterable) {
 		this.array = null;
 		this.iterable = Objects.requireNonNull(iterable);
 	}
@@ -182,7 +182,7 @@ final class FluxFirstEmitting<T> extends Flux<T> implements MultiReceiver {
 				AtomicIntegerFieldUpdater.newUpdater(RaceCoordinator.class, "wip");
 
 		@SuppressWarnings("unchecked")
-		public RaceCoordinator(int n) {
+		RaceCoordinator(int n) {
 			subscribers = new FirstEmittingSubscriber[n];
 			wip = Integer.MIN_VALUE;
 		}
@@ -287,7 +287,7 @@ final class FluxFirstEmitting<T> extends Flux<T> implements MultiReceiver {
 	}
 
 	static final class FirstEmittingSubscriber<T> extends Operators.DeferredSubscription
-			implements Subscriber<T>, Producer {
+			implements Subscriber<T>, OperatorContext<T> {
 
 		final RaceCoordinator<T> parent;
 
@@ -297,7 +297,12 @@ final class FluxFirstEmitting<T> extends Flux<T> implements MultiReceiver {
 
 		boolean won;
 
-		public FirstEmittingSubscriber(Subscriber<? super T> actual,
+		@Override
+		public void onContext(Context context) {
+			//IGNORE
+		}
+
+		FirstEmittingSubscriber(Subscriber<? super T> actual,
 				RaceCoordinator<T> parent,
 				int index) {
 			this.actual = actual;
@@ -311,7 +316,7 @@ final class FluxFirstEmitting<T> extends Flux<T> implements MultiReceiver {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

@@ -21,8 +21,6 @@ import java.util.function.BiConsumer;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Fuseable;
-import reactor.core.Loopback;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -54,7 +52,7 @@ final class FluxHandle<T, R> extends FluxSource<T, R> {
 	}
 
 	static final class HandleSubscriber<T, R>
-			implements Subscriber<T>, Receiver, Producer, Loopback, Subscription,
+			implements Subscriber<T>, Receiver, OperatorContext<R>, Subscription,
 								 Fuseable.ConditionalSubscriber<T>, Trackable,
                        SynchronousSink<R> {
 		final Subscriber<? super R>			actual;
@@ -202,13 +200,8 @@ final class FluxHandle<T, R> extends FluxSource<T, R> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super R> actual() {
 			return actual;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return handler;
 		}
 
 		@Override
@@ -228,7 +221,7 @@ final class FluxHandle<T, R> extends FluxSource<T, R> {
 	}
 
 	static final class HandleConditionalSubscriber<T, R>
-			implements Fuseable.ConditionalSubscriber<T>, Receiver, Producer, Loopback,
+			implements Fuseable.ConditionalSubscriber<T>, Receiver, OperatorContext<R>,
 			           Subscription, Trackable, SynchronousSink<R> {
 		final Fuseable.ConditionalSubscriber<? super R> actual;
 		final BiConsumer<? super T, SynchronousSink<R>> handler;
@@ -351,13 +344,8 @@ final class FluxHandle<T, R> extends FluxSource<T, R> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super R> actual() {
 			return actual;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return handler;
 		}
 
 		@Override

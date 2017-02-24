@@ -69,7 +69,7 @@ final class MonoElementAt<T> extends MonoSource<T, T> implements Fuseable {
 
 		boolean done;
 
-		public ElementAtSubscriber(Subscriber<? super T> actual, long index,
+		ElementAtSubscriber(Subscriber<? super T> actual, long index,
 											T defaultValue) {
 			super(actual);
 			this.index = index;

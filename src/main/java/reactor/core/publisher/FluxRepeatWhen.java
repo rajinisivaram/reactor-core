@@ -23,7 +23,6 @@ import java.util.function.Function;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import reactor.core.Loopback;
 
 /**
  * Repeats a source when a companion sequence signals an item in response to the main's
@@ -193,7 +192,7 @@ final class FluxRepeatWhen<T> extends FluxSource<T, T> {
 	}
 
 	static final class RepeatWhenOtherSubscriber extends Flux<Long>
-			implements Subscriber<Object>, Loopback {
+			implements Subscriber<Object> {
 
 		RepeatWhenMainSubscriber<?> main;
 
@@ -224,14 +223,5 @@ final class FluxRepeatWhen<T> extends FluxSource<T, T> {
 			completionSignal.subscribe(s);
 		}
 
-		@Override
-		public Object connectedInput() {
-			return main;
-		}
-
-		@Override
-		public Object connectedOutput() {
-			return completionSignal;
-		}
 	}
 }

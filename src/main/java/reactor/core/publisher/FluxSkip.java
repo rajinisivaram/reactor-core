@@ -17,7 +17,6 @@ package reactor.core.publisher;
 
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -49,7 +48,7 @@ final class FluxSkip<T> extends FluxSource<T, T> {
 
 	static final class SkipSubscriber<T>
 			implements Subscriber<T>, Receiver,
-			           Producer, Subscription, Trackable {
+			           OperatorContext<T>, Subscription, Trackable {
 
 		final Subscriber<? super T> actual;
 
@@ -99,7 +98,7 @@ final class FluxSkip<T> extends FluxSource<T, T> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

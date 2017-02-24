@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,7 +32,7 @@ final class MonoCreate<T> extends Mono<T> {
 
     final Consumer<MonoSink<T>> callback;
 
-    public MonoCreate(Consumer<MonoSink<T>> callback) {
+    MonoCreate(Consumer<MonoSink<T>> callback) {
         this.callback = callback;
     }
 
@@ -50,7 +50,9 @@ final class MonoCreate<T> extends Mono<T> {
         }
     }
 
-    static final class DefaultMonoSink<T> implements MonoSink<T>, Subscription {
+    static final class DefaultMonoSink<T> implements MonoSink<T>,
+                                                     OperatorContext<T>,
+                                                     Subscription {
         final Subscriber<? super T> actual;
         
         volatile Cancellation disposable;
@@ -72,6 +74,11 @@ final class MonoCreate<T> extends Mono<T> {
         
         DefaultMonoSink(Subscriber<? super T> actual) {
             this.actual = actual;
+        }
+
+        @Override
+        public Subscriber<? super T> actual() {
+            return actual;
         }
 
         @Override

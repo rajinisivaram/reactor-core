@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
 import reactor.core.MultiProducer;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -244,7 +243,8 @@ public final class DirectProcessor<T>
 	}
 
 	static final class DirectProcessorSubscription<T> implements Subscription,
-																 Receiver, Producer,
+																 Receiver,
+																 OperatorContext<T>,
 																 Trackable {
 
 		final Subscriber<? super T> actual;
@@ -258,7 +258,7 @@ public final class DirectProcessor<T>
 		static final AtomicLongFieldUpdater<DirectProcessorSubscription> REQUESTED =
 		  AtomicLongFieldUpdater.newUpdater(DirectProcessorSubscription.class, "requested");
 
-		public DirectProcessorSubscription(Subscriber<? super T> actual, DirectProcessor<T> parent) {
+		DirectProcessorSubscription(Subscriber<? super T> actual, DirectProcessor<T> parent) {
 			this.actual = actual;
 			this.parent = parent;
 		}
@@ -284,7 +284,7 @@ public final class DirectProcessor<T>
 		}
 
 		@Override
-		public Subscriber<? super T> downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

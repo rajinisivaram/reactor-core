@@ -33,7 +33,6 @@ import reactor.core.Disposable;
 import reactor.core.Exceptions;
 import reactor.core.Fuseable;
 import reactor.core.MultiProducer;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -45,7 +44,7 @@ import reactor.core.Trackable;
  *
  * @see <a href="https://github.com/reactor/reactive-streams-commons">Reactive-Streams-Commons</a>
  */
-final class FluxPublish<T> extends ConnectableFlux<T> implements Receiver, Producer {
+final class FluxPublish<T> extends ConnectableFlux<T> implements Receiver, OperatorContext<T> {
 
 	/**
 	 * The source observable.
@@ -134,7 +133,7 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Receiver, Produ
 	}
 
 	@Override
-	public Object downstream() {
+	public Subscriber<? super T> actual() {
 		return connection;
 	}
 
@@ -578,7 +577,7 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Receiver, Produ
 		}
 	}
 
-	static final class PublishInner<T> implements Subscription, Producer, Trackable {
+	static final class PublishInner<T> implements Subscription, OperatorContext<T>, Trackable {
 
 		final Subscriber<? super T> actual;
 
@@ -632,7 +631,7 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Receiver, Produ
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

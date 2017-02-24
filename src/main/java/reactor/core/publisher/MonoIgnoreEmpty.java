@@ -18,7 +18,6 @@ package reactor.core.publisher;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 
 /**
@@ -38,7 +37,7 @@ final class MonoIgnoreEmpty<T> extends MonoSource<T, T> {
 		source.subscribe(new IgnoreElementsSubscriber<>(s));
 	}
 
-	static final class IgnoreElementsSubscriber<T> implements Subscriber<T>, Producer, Subscription,
+	static final class IgnoreElementsSubscriber<T> implements Subscriber<T>, OperatorContext<T>, Subscription,
 	                                                          Receiver {
 		final Subscriber<? super T> actual;
 
@@ -75,7 +74,7 @@ final class MonoIgnoreEmpty<T> extends MonoSource<T, T> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

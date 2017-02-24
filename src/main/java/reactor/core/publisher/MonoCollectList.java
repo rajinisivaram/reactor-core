@@ -65,7 +65,7 @@ final class MonoCollectList<T, C extends Collection<? super T>> extends MonoSour
 
 		Subscription s;
 
-		public MonoBufferAllSubscriber(Subscriber<? super C> actual, C collection) {
+		MonoBufferAllSubscriber(Subscriber<? super C> actual, C collection) {
 			super(actual);
 			this.collection = collection;
 		}

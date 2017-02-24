@@ -45,6 +45,6 @@ final class FluxDoFinallyFuseable<T> extends FluxSource<T, T> implements Fuseabl
 
 	@Override
 	public void subscribe(Subscriber<? super T> s) {
-		source.subscribe(FluxDoFinally.createSubscriber(source, s, onFinally));
+		source.subscribe(FluxDoFinally.createSubscriber(s, onFinally, true));
 	}
 }

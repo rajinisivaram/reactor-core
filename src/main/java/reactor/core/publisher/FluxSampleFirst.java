@@ -61,7 +61,9 @@ final class FluxSampleFirst<T, U> extends FluxSource<T, T> {
 		return Integer.MAX_VALUE;
 	}
 
-	static final class ThrottleFirstMain<T, U> implements Subscriber<T>, Subscription {
+	static final class ThrottleFirstMain<T, U> implements Subscriber<T>,
+	                                                      OperatorContext<T>,
+	                                                      Subscription {
 
 		final Subscriber<? super T> actual;
 
@@ -199,6 +201,11 @@ final class FluxSampleFirst<T, U> extends FluxSource<T, T> {
 			}
 		}
 
+		@Override
+		public Subscriber<? super T> actual() {
+			return actual;
+		}
+
 		void otherNext() {
 			gate = false;
 		}
@@ -215,7 +222,7 @@ final class FluxSampleFirst<T, U> extends FluxSource<T, T> {
 
 		final ThrottleFirstMain<?, U> main;
 
-		public ThrottleFirstOther(ThrottleFirstMain<?, U> main) {
+		ThrottleFirstOther(ThrottleFirstMain<?, U> main) {
 			this.main = main;
 		}
 

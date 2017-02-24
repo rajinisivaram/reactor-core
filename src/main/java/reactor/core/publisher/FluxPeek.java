@@ -22,7 +22,6 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
 import reactor.core.Fuseable.ConditionalSubscriber;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.publisher.FluxPeekFuseable.PeekConditionalSubscriber;
 
@@ -82,7 +81,7 @@ final class FluxPeek<T> extends FluxSource<T, T> implements SignalPeek<T> {
 		source.subscribe(new PeekSubscriber<>(s, this));
 	}
 
-	static final class PeekSubscriber<T> implements Subscriber<T>, Subscription, Receiver, Producer {
+	static final class PeekSubscriber<T> implements Subscriber<T>, Subscription, Receiver, OperatorContext<T> {
 
 		final Subscriber<? super T> actual;
 
@@ -92,7 +91,7 @@ final class FluxPeek<T> extends FluxSource<T, T> implements SignalPeek<T> {
 
 		boolean done;
 
-		public PeekSubscriber(Subscriber<? super T> actual, SignalPeek<T> parent) {
+		PeekSubscriber(Subscriber<? super T> actual, SignalPeek<T> parent) {
 			this.actual = actual;
 			this.parent = parent;
 		}
@@ -229,7 +228,7 @@ final class FluxPeek<T> extends FluxSource<T, T> implements SignalPeek<T> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

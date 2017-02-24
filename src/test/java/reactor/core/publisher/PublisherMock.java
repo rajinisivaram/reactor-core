@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,8 @@ import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Fuseable;
-import reactor.core.Loopback;
 import reactor.core.MultiProducer;
 import reactor.core.MultiReceiver;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -80,14 +78,13 @@ public class PublisherMock<T> implements Publisher<T> {
 
 	public static final class DownstreamMock<T> extends CountDownLatch
 			implements Trackable, Subscription, SynchronousSink<T>, MultiReceiver,
-			           MultiProducer, Producer, Receiver, Loopback {
+			           MultiProducer, OperatorContext<T>, Receiver {
 
 		final Subscriber<? super T> s;
 		final Trackable             trackable;
-		final Loopback              loopback;
 		final MultiProducer         multiProducer;
 		final MultiReceiver         multiReceiver;
-		final Producer              producer;
+		final OperatorContext<T>              producer;
 		final Receiver              receiver;
 
 		volatile long requested;
@@ -99,9 +96,7 @@ public class PublisherMock<T> implements Publisher<T> {
 		static final Trackable EMPTY_TRACKABLE = new Trackable() {
 		};
 
-		static final Loopback EMPTY_LOOPBACK = new Loopback() {
-		};
-
+		@SuppressWarnings("unchecked")
 		public DownstreamMock(Subscriber<? super T> s) {
 			super(1);
 			this.s = s;
@@ -111,20 +106,14 @@ public class PublisherMock<T> implements Publisher<T> {
 			else {
 				this.trackable = EMPTY_TRACKABLE;
 			}
-			if (s instanceof Loopback) {
-				this.loopback = (Loopback) s;
-			}
-			else {
-				this.loopback = EMPTY_LOOPBACK;
-			}
 			if (s instanceof Receiver) {
 				this.receiver = (Receiver) s;
 			}
 			else {
 				this.receiver = null;
 			}
-			if (s instanceof Producer) {
-				this.producer = (Producer) s;
+			if (s instanceof OperatorContext) {
+				this.producer = (OperatorContext<T>) s;
 			}
 			else {
 				this.producer = null;
@@ -205,16 +194,6 @@ public class PublisherMock<T> implements Publisher<T> {
 		}
 
 		@Override
-		public Object connectedInput() {
-			return loopback.connectedInput();
-		}
-
-		@Override
-		public Object connectedOutput() {
-			return loopback.connectedOutput();
-		}
-
-		@Override
 		public Iterator<?> downstreams() {
 			return multiProducer != null ? multiProducer.downstreams() : null;
 		}
@@ -247,8 +226,8 @@ public class PublisherMock<T> implements Publisher<T> {
 		}
 
 		@Override
-		public Object downstream() {
-			return producer != null ? producer.downstream() : null;
+		public Subscriber<? super T> actual() {
+			return producer != null ? producer.actual() : null;
 		}
 
 		@Override

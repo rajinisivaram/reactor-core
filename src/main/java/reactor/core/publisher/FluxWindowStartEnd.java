@@ -87,7 +87,7 @@ final class FluxWindowStartEnd<T, U, V> extends FluxSource<T, Flux<T>> {
 	}
 
 	static final class WindowStartEndMainSubscriber<T, U, V>
-			implements Subscriber<T>, Subscription, Disposable {
+			implements Subscriber<T>, OperatorContext<Flux<T>>, Subscription, Disposable {
 
 		final Subscriber<? super Flux<T>> actual;
 
@@ -159,6 +159,11 @@ final class FluxWindowStartEnd<T, U, V> extends FluxSource<T, Flux<T>> {
 			this.windows = new HashSet<>();
 			this.processorQueueSupplier = processorQueueSupplier;
 			this.open = 1;
+		}
+
+		@Override
+		public Subscriber<? super Flux<T>> actual() {
+			return actual;
 		}
 
 		@Override

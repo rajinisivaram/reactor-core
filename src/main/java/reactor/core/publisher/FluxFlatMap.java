@@ -33,9 +33,9 @@ import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
 import reactor.core.Fuseable;
 import reactor.core.MultiReceiver;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
+import reactor.util.Context;
 
 /**
  * Maps a sequence of values each into a Publisher and flattens them
@@ -59,15 +59,6 @@ final class FluxFlatMap<T, R> extends FluxSource<T, R> {
 
 	final Supplier<? extends Queue<R>> innerQueueSupplier;
 
-	void check(int prefetch, int maxConcurrency) {
-		if (prefetch <= 0) {
-			throw new IllegalArgumentException("prefetch > 0 required but it was " + prefetch);
-		}
-		if (maxConcurrency <= 0) {
-			throw new IllegalArgumentException("maxConcurrency > 0 required but it was " + maxConcurrency);
-		}
-	}
-
 	FluxFlatMap(Publisher<? extends T> source,
 			Function<? super T, ? extends Publisher<? extends R>> mapper,
 			boolean delayError,
@@ -76,45 +67,12 @@ final class FluxFlatMap<T, R> extends FluxSource<T, R> {
 			int prefetch,
 			Supplier<? extends Queue<R>> innerQueueSupplier) {
 		super(source);
-		check(prefetch, maxConcurrency);
-		this.mapper = Objects.requireNonNull(mapper, "mapper");
-		this.delayError = delayError;
-		this.prefetch = prefetch;
-		this.maxConcurrency = maxConcurrency;
-		this.mainQueueSupplier =
-				Objects.requireNonNull(mainQueueSupplier, "mainQueueSupplier");
-		this.innerQueueSupplier =
-				Objects.requireNonNull(innerQueueSupplier, "innerQueueSupplier");
-	}
-
-	FluxFlatMap(Flux<? extends T> source,
-			Function<? super T, ? extends Publisher<? extends R>> mapper,
-			boolean delayError,
-			int maxConcurrency,
-			Supplier<? extends Queue<R>> mainQueueSupplier,
-			int prefetch,
-			Supplier<? extends Queue<R>> innerQueueSupplier) {
-		super(source);
-		check(prefetch, maxConcurrency);
-		this.mapper = Objects.requireNonNull(mapper, "mapper");
-		this.delayError = delayError;
-		this.prefetch = prefetch;
-		this.maxConcurrency = maxConcurrency;
-		this.mainQueueSupplier =
-				Objects.requireNonNull(mainQueueSupplier, "mainQueueSupplier");
-		this.innerQueueSupplier =
-				Objects.requireNonNull(innerQueueSupplier, "innerQueueSupplier");
-	}
-
-	FluxFlatMap(Mono<? extends T> source,
-			Function<? super T, ? extends Publisher<? extends R>> mapper,
-			boolean delayError,
-			int maxConcurrency,
-			Supplier<? extends Queue<R>> mainQueueSupplier,
-			int prefetch,
-			Supplier<? extends Queue<R>> innerQueueSupplier) {
-		super(source);
-		check(prefetch, maxConcurrency);
+		if (prefetch <= 0) {
+			throw new IllegalArgumentException("prefetch > 0 required but it was " + prefetch);
+		}
+		if (maxConcurrency <= 0) {
+			throw new IllegalArgumentException("maxConcurrency > 0 required but it was " + maxConcurrency);
+		}
 		this.mapper = Objects.requireNonNull(mapper, "mapper");
 		this.delayError = delayError;
 		this.prefetch = prefetch;
@@ -224,7 +182,8 @@ final class FluxFlatMap<T, R> extends FluxSource<T, R> {
 	}
 
 	static final class FlatMapMain<T, R> extends SpscFreeListTracker<FlatMapInner<R>>
-			implements Subscriber<T>, Subscription, Receiver, MultiReceiver, Producer,
+			implements Subscriber<T>, Subscription, Receiver, MultiReceiver, 
+			           OperatorContext<R>,
 			           Trackable {
 
 		final Subscriber<? super R> actual;
@@ -278,7 +237,7 @@ final class FluxFlatMap<T, R> extends FluxSource<T, R> {
 
 		int produced;
 
-		public FlatMapMain(Subscriber<? super R> actual,
+		FlatMapMain(Subscriber<? super R> actual,
 				Function<? super T, ? extends Publisher<? extends R>> mapper,
 				boolean delayError,
 				int maxConcurrency,
@@ -297,29 +256,29 @@ final class FluxFlatMap<T, R> extends FluxSource<T, R> {
 
 		@SuppressWarnings("unchecked")
 		@Override
-		protected FlatMapInner<R>[] empty() {
+		FlatMapInner<R>[] empty() {
 			return EMPTY;
 		}
 
 		@SuppressWarnings("unchecked")
 		@Override
-		protected FlatMapInner<R>[] terminated() {
+		FlatMapInner<R>[] terminated() {
 			return TERMINATED;
 		}
 
 		@SuppressWarnings("unchecked")
 		@Override
-		protected FlatMapInner<R>[] newArray(int size) {
+		FlatMapInner<R>[] newArray(int size) {
 			return new FlatMapInner[size];
 		}
 
 		@Override
-		protected void setIndex(FlatMapInner<R> entry, int index) {
+		void setIndex(FlatMapInner<R> entry, int index) {
 			entry.index = index;
 		}
 
 		@Override
-		protected void unsubscribeEntry(FlatMapInner<R> entry) {
+		void unsubscribeEntry(FlatMapInner<R> entry) {
 			entry.cancel();
 		}
 
@@ -914,13 +873,13 @@ final class FluxFlatMap<T, R> extends FluxSource<T, R> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super R> actual() {
 			return actual;
 		}
 	}
 
 	static final class FlatMapInner<R>
-			implements Subscriber<R>, Subscription, Producer, Receiver, Trackable {
+			implements Subscriber<R>, Subscription, OperatorContext, Receiver, Trackable {
 
 		final FlatMapMain<?, R> parent;
 
@@ -948,10 +907,15 @@ final class FluxFlatMap<T, R> extends FluxSource<T, R> {
 
 		int index;
 
-		public FlatMapInner(FlatMapMain<?, R> parent, int prefetch) {
+		FlatMapInner(FlatMapMain<?, R> parent, int prefetch) {
 			this.parent = parent;
 			this.prefetch = prefetch;
 			this.limit = prefetch - (prefetch >> 2);
+		}
+
+		@Override
+		public void onContext(Context context) {
+			//IGNORE
 		}
 
 		@Override
@@ -1059,7 +1023,7 @@ final class FluxFlatMap<T, R> extends FluxSource<T, R> {
 		}
 
 		@Override
-		public FluxFlatMap.FlatMapMain<?, R> downstream() {
+		public FluxFlatMap.FlatMapMain<?, R> actual() {
 			return parent;
 		}
 	}
@@ -1067,31 +1031,31 @@ final class FluxFlatMap<T, R> extends FluxSource<T, R> {
 
 abstract class SpscFreeListTracker<T> {
 
-	private volatile T[] array = empty();
+	volatile T[] array = empty();
 
-	private int[] free = FREE_EMPTY;
+	int[] free = FREE_EMPTY;
 
-	private long producerIndex;
-	private long consumerIndex;
+	long producerIndex;
+	long consumerIndex;
 
 	volatile int size;
 	@SuppressWarnings("rawtypes")
 	static final AtomicIntegerFieldUpdater<SpscFreeListTracker> SIZE =
 			AtomicIntegerFieldUpdater.newUpdater(SpscFreeListTracker.class, "size");
 
-	private static final int[] FREE_EMPTY = new int[0];
+	static final int[] FREE_EMPTY = new int[0];
 
-	protected abstract T[] empty();
+	abstract T[] empty();
 
-	protected abstract T[] terminated();
+	abstract T[] terminated();
 
-	protected abstract T[] newArray(int size);
+	abstract T[] newArray(int size);
 
-	protected abstract void unsubscribeEntry(T entry);
+	abstract void unsubscribeEntry(T entry);
 
-	protected abstract void setIndex(T entry, int index);
+	abstract void setIndex(T entry, int index);
 
-	protected final void unsubscribe() {
+	final void unsubscribe() {
 		T[] a;
 		T[] t = terminated();
 		synchronized (this) {
@@ -1110,11 +1074,11 @@ abstract class SpscFreeListTracker<T> {
 		}
 	}
 
-	public final T[] get() {
+	final T[] get() {
 		return array;
 	}
 
-	public final boolean add(T entry) {
+	final boolean add(T entry) {
 		T[] a = array;
 		if (a == terminated()) {
 			return false;
@@ -1153,7 +1117,7 @@ abstract class SpscFreeListTracker<T> {
 		return true;
 	}
 
-	public final void remove(int index) {
+	final void remove(int index) {
 		synchronized (this) {
 			T[] a = array;
 			if (a != terminated()) {
@@ -1164,7 +1128,7 @@ abstract class SpscFreeListTracker<T> {
 		}
 	}
 
-	private int pollFree() {
+	int pollFree() {
 		int[] a = free;
 		int m = a.length - 1;
 		long ci = consumerIndex;
@@ -1176,7 +1140,7 @@ abstract class SpscFreeListTracker<T> {
 		return a[offset];
 	}
 
-	private void offerFree(int index) {
+	void offerFree(int index) {
 		int[] a = free;
 		int m = a.length - 1;
 		long pi = producerIndex;
@@ -1185,7 +1149,7 @@ abstract class SpscFreeListTracker<T> {
 		producerIndex = pi + 1;
 	}
 
-	protected final boolean isEmpty() {
+	final boolean isEmpty() {
 		return size == 0;
 	}
 }

@@ -23,10 +23,8 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -88,7 +86,7 @@ final class FluxMapSignal<T, R> extends FluxSource<T, R> {
 
     static final class FluxMapSignalSubscriber<T, R> 
     extends AbstractQueue<R>
-    implements Subscriber<T>, Receiver, Producer, Trackable, Subscription,
+    implements Subscriber<T>, Receiver, OperatorContext<R>, Trackable, Subscription,
                BooleanSupplier {
 
         final Subscriber<? super R>            actual;
@@ -231,7 +229,7 @@ final class FluxMapSignal<T, R> extends FluxSource<T, R> {
         }
 
         @Override
-        public Object downstream() {
+        public Subscriber<? super R> actual() {
             return actual;
         }
 

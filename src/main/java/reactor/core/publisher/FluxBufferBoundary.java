@@ -86,7 +86,7 @@ final class FluxBufferBoundary<T, U, C extends Collection<? super T>>
 	}
 
 	static final class BufferBoundaryMain<T, U, C extends Collection<? super T>>
-			implements Subscriber<T>, Subscription {
+			implements OperatorContext<C>, Subscriber<T>, Subscription {
 
 		final Subscriber<? super C> actual;
 
@@ -263,6 +263,11 @@ final class FluxBufferBoundary<T, U, C extends Collection<? super T>>
 
 				return false;
 			}
+		}
+
+		@Override
+		public Subscriber<? super C> actual() {
+			return actual;
 		}
 	}
 

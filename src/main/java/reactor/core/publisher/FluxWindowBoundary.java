@@ -73,7 +73,7 @@ final class FluxWindowBoundary<T, U> extends FluxSource<T, Flux<T>> {
 	}
 
 	static final class WindowBoundaryMain<T, U>
-			implements Subscriber<T>, Subscription, Disposable {
+			implements Subscriber<T>, OperatorContext<Flux<T>>, Subscription, Disposable {
 
 		final Subscriber<? super Flux<T>> actual;
 
@@ -119,7 +119,7 @@ final class FluxWindowBoundary<T, U> extends FluxSource<T, Flux<T>> {
 		
 		static final Object DONE = new Object();
 
-		public WindowBoundaryMain(Subscriber<? super Flux<T>> actual,
+		WindowBoundaryMain(Subscriber<? super Flux<T>> actual,
 				Supplier<? extends Queue<T>> processorQueueSupplier,
 				Queue<T> processorQueue, Queue<Object> queue) {
 			this.actual = actual;
@@ -128,6 +128,11 @@ final class FluxWindowBoundary<T, U> extends FluxSource<T, Flux<T>> {
 			this.open = 2;
 			this.boundary = new WindowBoundaryOther<>(this);
 			this.queue = queue;
+		}
+
+		@Override
+		public Subscriber<? super Flux<T>> actual() {
+			return actual;
 		}
 
 		@Override

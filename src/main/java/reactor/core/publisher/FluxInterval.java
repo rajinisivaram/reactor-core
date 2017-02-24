@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ final class FluxInterval extends Flux<Long> {
 	
 	final TimeUnit unit;
 
-	public FluxInterval(
+	FluxInterval(
 			long initialDelay, 
 			long period, 
 			TimeUnit unit, 
@@ -79,7 +79,7 @@ final class FluxInterval extends Flux<Long> {
 		
 		volatile boolean cancelled;
 
-		public IntervalRunnable(Subscriber<? super Long> s, TimedWorker worker) {
+		IntervalRunnable(Subscriber<? super Long> s, TimedWorker worker) {
 			this.s = s;
 			this.worker = worker;
 		}

@@ -19,7 +19,6 @@ import java.util.ArrayDeque;
 
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -51,7 +50,7 @@ final class FluxSkipLast<T> extends FluxSource<T, T> {
 
 	static final class SkipLastSubscriber<T>
 			extends ArrayDeque<T>
-			implements Subscriber<T>, Receiver, Producer, Subscription,
+			implements Subscriber<T>, Receiver, OperatorContext<T>, Subscription,
 			           Trackable {
 		final Subscriber<? super T> actual;
 
@@ -110,7 +109,7 @@ final class FluxSkipLast<T> extends FluxSource<T, T> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

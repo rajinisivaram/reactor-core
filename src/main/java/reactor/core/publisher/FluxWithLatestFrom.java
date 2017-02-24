@@ -70,7 +70,7 @@ final class FluxWithLatestFrom<T, U, R> extends FluxSource<T, R> {
 	}
 
 	static final class WithLatestFromSubscriber<T, U, R>
-			implements Subscriber<T>, Subscription {
+			implements Subscriber<T>, OperatorContext<R>, Subscription {
 
 		final Subscriber<? super R> actual;
 
@@ -107,6 +107,11 @@ final class FluxWithLatestFrom<T, U, R> extends FluxSource<T, R> {
 					Operators.reportSubscriptionSet();
 				}
 			}
+		}
+
+		@Override
+		public Subscriber<? super R> actual() {
+			return actual;
 		}
 
 		@Override

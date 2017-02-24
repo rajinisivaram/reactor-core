@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ final class MonoFlatMap<T, R> extends Flux<R> {
 
 	final Function<? super T, ? extends Publisher<? extends R>> mapper;
 
-	public MonoFlatMap(Mono<? extends T> source,
+	MonoFlatMap(Mono<? extends T> source,
 			Function<? super T, ? extends Publisher<? extends R>> mapper) {
 		this.source = source;
 		this.mapper = mapper;
@@ -46,7 +46,9 @@ final class MonoFlatMap<T, R> extends Flux<R> {
 		source.subscribe(new FlattenSubscriber<T, R>(s, mapper));
 	}
 
-	static final class FlattenSubscriber<T, R> implements Subscriber<T>, Subscription {
+	static final class FlattenSubscriber<T, R> implements Subscriber<T>,
+	                                                      OperatorContext<R>,
+	                                                      Subscription {
 
 		final Subscriber<? super R> actual;
 
@@ -68,10 +70,15 @@ final class MonoFlatMap<T, R> extends Flux<R> {
 
 		boolean hasValue;
 
-		public FlattenSubscriber(Subscriber<? super R> actual,
+		FlattenSubscriber(Subscriber<? super R> actual,
 				Function<? super T, ? extends Publisher<? extends R>> mapper) {
 			this.actual = actual;
 			this.mapper = mapper;
+		}
+
+		@Override
+		public Subscriber<? super R> actual() {
+			return actual;
 		}
 
 		@Override

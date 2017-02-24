@@ -21,8 +21,6 @@ import java.util.function.Function;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Fuseable.ConditionalSubscriber;
-import reactor.core.Loopback;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -37,7 +35,7 @@ final class FluxDistinctUntilChanged<T, K> extends FluxSource<T, T> {
 
 	final Function<? super T, K> keyExtractor;
 
-	public FluxDistinctUntilChanged(Flux<? extends T> source, Function<? super T, K> keyExtractor) {
+	FluxDistinctUntilChanged(Flux<? extends T> source, Function<? super T, K> keyExtractor) {
 		super(source);
 		this.keyExtractor = Objects.requireNonNull(keyExtractor, "keyExtractor");
 	}
@@ -55,7 +53,7 @@ final class FluxDistinctUntilChanged<T, K> extends FluxSource<T, T> {
 	}
 
 	static final class DistinctUntilChangedSubscriber<T, K>
-			implements ConditionalSubscriber<T>, Receiver, Producer, Loopback,
+			implements ConditionalSubscriber<T>, Receiver, OperatorContext<T>,
 			           Subscription, Trackable {
 		final Subscriber<? super T> actual;
 
@@ -67,7 +65,7 @@ final class FluxDistinctUntilChanged<T, K> extends FluxSource<T, T> {
 
 		K lastKey;
 
-		public DistinctUntilChangedSubscriber(Subscriber<? super T> actual,
+		DistinctUntilChangedSubscriber(Subscriber<? super T> actual,
 													   Function<? super T, K> keyExtractor) {
 			this.actual = actual;
 			this.keyExtractor = keyExtractor;
@@ -148,18 +146,8 @@ final class FluxDistinctUntilChanged<T, K> extends FluxSource<T, T> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return keyExtractor;
-		}
-
-		@Override
-		public Object connectedOutput() {
-			return lastKey;
 		}
 
 		@Override
@@ -179,7 +167,7 @@ final class FluxDistinctUntilChanged<T, K> extends FluxSource<T, T> {
 	}
 
 	static final class DistinctUntilChangedConditionalSubscriber<T, K>
-			implements ConditionalSubscriber<T>, Receiver, Producer, Loopback,
+			implements ConditionalSubscriber<T>, Receiver, OperatorContext<T>,
 			           Subscription, Trackable {
 		final ConditionalSubscriber<? super T> actual;
 
@@ -271,18 +259,8 @@ final class FluxDistinctUntilChanged<T, K> extends FluxSource<T, T> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return keyExtractor;
-		}
-
-		@Override
-		public Object connectedOutput() {
-			return lastKey;
 		}
 
 		@Override

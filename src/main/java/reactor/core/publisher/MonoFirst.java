@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -39,17 +39,17 @@ final class MonoFirst<T> extends Mono<T> implements MultiReceiver {
 	final Iterable<? extends Mono<? extends T>> iterable;
 
 	@SafeVarargs
-	public MonoFirst(Mono<? extends T>... array) {
+	MonoFirst(Mono<? extends T>... array) {
 		this.array = Objects.requireNonNull(array, "array");
 		this.iterable = null;
 	}
 
-	public MonoFirst(Iterable<? extends Mono<? extends T>> iterable) {
+	MonoFirst(Iterable<? extends Mono<? extends T>> iterable) {
 		this.array = null;
 		this.iterable = Objects.requireNonNull(iterable);
 	}
 
-	public Mono<T> orAdditionalSource(Mono<? extends T> other) {
+	Mono<T> orAdditionalSource(Mono<? extends T> other) {
 		if (array != null) {
 			int n = array.length;
 			@SuppressWarnings("unchecked") Mono<? extends T>[] newArray = new Mono[n + 1];

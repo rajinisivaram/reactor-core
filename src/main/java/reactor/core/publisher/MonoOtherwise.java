@@ -32,7 +32,7 @@ final class MonoOtherwise<T> extends MonoSource<T, T> {
 
 	final Function<? super Throwable, ? extends Publisher<? extends T>> nextFactory;
 
-	public MonoOtherwise(Mono<? extends T> source,
+	MonoOtherwise(Mono<? extends T> source,
 						   Function<? super Throwable, ? extends Mono<? extends T>>
 								   nextFactory) {
 		super(source);

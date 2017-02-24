@@ -26,7 +26,6 @@ import reactor.core.Exceptions;
 import reactor.core.Fuseable;
 import reactor.core.Fuseable.ConditionalSubscriber;
 import reactor.core.Fuseable.QueueSubscription;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 
 /**
@@ -46,22 +45,23 @@ final class FluxDoFinally<T> extends FluxSource<T, T> {
 
 	final Consumer<SignalType> onFinally;
 
-	static <T> Subscriber<T> createSubscriber(Publisher<? extends T> source,
-			Subscriber<? super T> s, Consumer<SignalType> onFinally) {
-		Subscriber<T> subscriber;
-		if (source instanceof Fuseable && s instanceof ConditionalSubscriber) {
-			subscriber = new DoFinallyFuseableConditionalSubscriber<T>((ConditionalSubscriber<? super T>) s, onFinally);
+	@SuppressWarnings("unchecked")
+	static <T> Subscriber<T> createSubscriber(
+			Subscriber<? super T> s, Consumer<SignalType> onFinally,
+			boolean fuseable) {
+
+		if (fuseable) {
+			if(s instanceof ConditionalSubscriber) {
+				return new DoFinallyFuseableConditionalSubscriber<>(
+						(ConditionalSubscriber<?	super T>) s, onFinally);
+			}
+			return new DoFinallyFuseableSubscriber<>(s, onFinally);
 		}
-		else if (source instanceof Fuseable) {
-			subscriber = new DoFinallyFuseableSubscriber<>(s, onFinally);
+
+		if (s instanceof ConditionalSubscriber) {
+			return new DoFinallyConditionalSubscriber<>((ConditionalSubscriber<? super T>) s, onFinally);
 		}
-		else if (s instanceof ConditionalSubscriber) {
-			subscriber = new DoFinallyConditionalSubscriber<>((ConditionalSubscriber<? super T>) s, onFinally);
-		}
-		else {
-			subscriber = new DoFinallySubscriber<>(s, onFinally);
-		}
-		return subscriber;
+		return new DoFinallySubscriber<>(s, onFinally);
 	}
 
 	FluxDoFinally(Flux<? extends T> source, Consumer<SignalType> onFinally) {
@@ -71,11 +71,11 @@ final class FluxDoFinally<T> extends FluxSource<T, T> {
 
 	@Override
 	public void subscribe(Subscriber<? super T> s) {
-		source.subscribe(createSubscriber(source, s, onFinally));
+		source.subscribe(createSubscriber(s, onFinally, false));
 	}
 
 	static class DoFinallySubscriber<T> implements Subscriber<T>,
-	                                               Receiver, Producer,
+	                                               Receiver, OperatorContext<T>,
 	                                               Subscription {
 
 		final Subscriber<? super T> actual;
@@ -151,7 +151,7 @@ final class FluxDoFinally<T> extends FluxSource<T, T> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

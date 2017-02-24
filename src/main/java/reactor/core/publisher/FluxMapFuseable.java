@@ -23,8 +23,6 @@ import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Fuseable;
-import reactor.core.Loopback;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -50,12 +48,6 @@ final class FluxMapFuseable<T, R> extends FluxSource<T, R> implements Fuseable {
 	 *
 	 * @throws NullPointerException if either {@code source} or {@code mapper} is null.
 	 */
-	FluxMapFuseable(Flux<? extends T> source,
-			Function<? super T, ? extends R> mapper) {
-		super(source);
-		this.mapper = Objects.requireNonNull(mapper, "mapper");
-	}
-
 	FluxMapFuseable(Publisher<? extends T> source,
 			Function<? super T, ? extends R> mapper) {
 		super(source);
@@ -74,7 +66,7 @@ final class FluxMapFuseable<T, R> extends FluxSource<T, R> implements Fuseable {
 	}
 
 	static final class MapFuseableSubscriber<T, R>
-			implements Subscriber<T>, Receiver, Producer, Loopback, Subscription,
+			implements Subscriber<T>, Receiver, OperatorContext<R>, Subscription,
 			           SynchronousSubscription<R>, Trackable {
 
 		final Subscriber<? super R>            actual;
@@ -159,13 +151,8 @@ final class FluxMapFuseable<T, R> extends FluxSource<T, R> implements Fuseable {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super R> actual() {
 			return actual;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return mapper;
 		}
 
 		@Override
@@ -226,7 +213,7 @@ final class FluxMapFuseable<T, R> extends FluxSource<T, R> implements Fuseable {
 	}
 
 	static final class MapFuseableConditionalSubscriber<T, R>
-			implements ConditionalSubscriber<T>, Receiver, Producer, Loopback,
+			implements ConditionalSubscriber<T>, Receiver, OperatorContext<R>,
 			           SynchronousSubscription<R>, Trackable {
 
 		final ConditionalSubscriber<? super R> actual;
@@ -335,13 +322,8 @@ final class FluxMapFuseable<T, R> extends FluxSource<T, R> implements Fuseable {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super R> actual() {
 			return actual;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return mapper;
 		}
 
 		@Override

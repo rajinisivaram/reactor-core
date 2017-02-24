@@ -51,11 +51,12 @@ final class MonoDelayElement<T> extends MonoSource<T, T> {
 
 	@Override
 	public void subscribe(Subscriber<? super T> s) {
-		MonoDelayElementSubscriber r = new MonoDelayElementSubscriber<>(s, timedScheduler, delay, unit);
+		DelayElementSubscriber
+				r = new DelayElementSubscriber<>(s, timedScheduler, delay, unit);
 		source.subscribe(r);
 	}
 
-	static final class MonoDelayElementSubscriber<T> extends Operators.MonoSubscriber<T,T>
+	static final class DelayElementSubscriber<T> extends Operators.MonoSubscriber<T,T>
 			implements Subscription, Receiver {
 
 		final long delay;
@@ -67,7 +68,7 @@ final class MonoDelayElement<T> extends MonoSource<T, T> {
 		volatile Cancellation task;
 		volatile boolean done;
 
-		MonoDelayElementSubscriber(Subscriber<? super T> actual, TimedScheduler scheduler,
+		DelayElementSubscriber(Subscriber<? super T> actual, TimedScheduler scheduler,
 				long delay, TimeUnit unit) {
 			super(actual);
 			this.scheduler = scheduler;
@@ -104,11 +105,12 @@ final class MonoDelayElement<T> extends MonoSource<T, T> {
 				return;
 			}
 			this.done = true;
-			this.task = scheduler.schedule(() -> complete(t), delay, unit);
+			Cancellation task = scheduler.schedule(() -> complete(t), delay, unit);
 			if (task == Scheduler.REJECTED) {
 					throw Operators.onRejectedExecution(this, null, t);
 			}
 			else {
+				this.task = task;
 				Subscription actualS = s;
 				s = Operators.cancelledSubscription();
 				actualS.cancel();

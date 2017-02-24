@@ -39,7 +39,8 @@ final class FluxDematerialize<T> extends FluxSource<Signal<T>, T> {
 	}
 
 	static final class DematerializeSubscriber<T> extends AbstractQueue<T>
-			implements Subscriber<Signal<T>>, Subscription, BooleanSupplier {
+			implements Subscriber<Signal<T>>, OperatorContext<T>, Subscription,
+			           BooleanSupplier {
 
 		final Subscriber<? super T> actual;
 
@@ -148,6 +149,11 @@ final class FluxDematerialize<T> extends FluxSource<Signal<T>, T> {
 		public void cancel() {
 			cancelled = true;
 			s.cancel();
+		}
+
+		@Override
+		public Subscriber<? super T> actual() {
+			return actual;
 		}
 
 		@Override

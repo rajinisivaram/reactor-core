@@ -1,5 +1,5 @@
 	/*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -42,7 +41,7 @@ final class MonoNext<T> extends MonoSource<T, T> {
 	}
 
 	static final class NextSubscriber<T>
-			implements Subscriber<T>, Subscription, Receiver, Producer, Trackable {
+			implements Subscriber<T>, Subscription, Receiver, OperatorContext<T>, Trackable {
 
 		final Subscriber<? super T> actual;
 
@@ -130,7 +129,7 @@ final class MonoNext<T> extends MonoSource<T, T> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

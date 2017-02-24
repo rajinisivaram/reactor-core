@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,7 +78,7 @@ final class MonoDelay extends Mono<Long> {
 
 		static final Disposable FINISHED = () -> { };
 
-		public MonoDelayRunnable(Subscriber<? super Long> s) {
+		MonoDelayRunnable(Subscriber<? super Long> s) {
 			this.s = s;
 		}
 
@@ -92,12 +92,10 @@ final class MonoDelay extends Mono<Long> {
 		public void run() {
 			if (requested) {
 				try {
-				if (CANCEL.getAndSet(this, FINISHED) != Flux.CANCELLED) {
-					s.onNext(0L);
-				}
-				if (cancel != Flux.CANCELLED) {
-					s.onComplete();
-				}
+					if (CANCEL.getAndSet(this, FINISHED) != Flux.CANCELLED) {
+						s.onNext(0L);
+						s.onComplete();
+					}
 				}
 				catch (Throwable t){
 					s.onError(Operators.onOperatorError(t));

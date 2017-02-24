@@ -35,8 +35,8 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Disposable;
 import reactor.core.Exceptions;
+import reactor.core.MultiProducer;
 import reactor.core.MultiReceiver;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 import reactor.util.concurrent.OpenHashSet;
@@ -126,8 +126,8 @@ final class FluxGroupJoin<TLeft, TRight, TLeftEnd, TRightEnd, R>
 	}
 
 	static final class GroupJoinSubscription<TLeft, TRight, TLeftEnd, TRightEnd, R>
-			implements Subscription, JoinSupport, Trackable, Producer, MultiReceiver,
-			           reactor.core.MultiProducer {
+			implements Subscription, JoinSupport, Trackable, OperatorContext<R>,
+			           MultiReceiver, MultiProducer {
 
 		final Subscriber<? super R> actual;
 
@@ -187,7 +187,7 @@ final class FluxGroupJoin<TLeft, TRight, TLeftEnd, TRightEnd, R>
 		static final Integer RIGHT_CLOSE = 4;
 
 		@SuppressWarnings("unchecked")
-		public GroupJoinSubscription(Subscriber<? super R> actual,
+		GroupJoinSubscription(Subscriber<? super R> actual,
 				Function<? super TLeft, ? extends Publisher<TLeftEnd>> leftEnd,
 				Function<? super TRight, ? extends Publisher<TRightEnd>> rightEnd,
 				BiFunction<? super TLeft, ? super Flux<TRight>, ? extends R> resultSelector,
@@ -226,7 +226,7 @@ final class FluxGroupJoin<TLeft, TRight, TLeftEnd, TRightEnd, R>
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super R> actual() {
 			return actual;
 		}
 
@@ -543,7 +543,7 @@ final class FluxGroupJoin<TLeft, TRight, TLeftEnd, TRightEnd, R>
 						Subscription.class,
 						"subscription");
 
-		public LeftRightSubscriber(JoinSupport parent, boolean isLeft) {
+		LeftRightSubscriber(JoinSupport parent, boolean isLeft) {
 			this.parent = parent;
 			this.isLeft = isLeft;
 		}
@@ -611,7 +611,7 @@ final class FluxGroupJoin<TLeft, TRight, TLeftEnd, TRightEnd, R>
 				Subscription.class,
 				"subscription");
 
-		public LeftRightEndSubscriber(JoinSupport parent, boolean isLeft, int index) {
+		LeftRightEndSubscriber(JoinSupport parent, boolean isLeft, int index) {
 			this.parent = parent;
 			this.isLeft = isLeft;
 			this.index = index;

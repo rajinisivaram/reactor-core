@@ -101,7 +101,9 @@ final class FluxSkipUntilOther<T, U> extends FluxSource<T, T> {
 
 	}
 
-	static final class SkipUntilMainSubscriber<T> implements Subscriber<T>, Subscription {
+	static final class SkipUntilMainSubscriber<T> implements Subscriber<T>,
+	                                                         OperatorContext<T>,
+	                                                         Subscription {
 
 		final Subscriber<T> actual;
 
@@ -134,6 +136,11 @@ final class FluxSkipUntilOther<T, U> extends FluxSource<T, T> {
 					Operators.reportSubscriptionSet();
 				}
 			}
+		}
+
+		@Override
+		public Subscriber<? super T> actual() {
+			return actual;
 		}
 
 		@Override

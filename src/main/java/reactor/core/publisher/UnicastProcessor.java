@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,9 @@ import reactor.util.concurrent.QueueSupplier;
  */
 public final class UnicastProcessor<T>
 		extends FluxProcessor<T, T>
-		implements Fuseable.QueueSubscription<T>, Fuseable, Producer, Receiver {
+		implements Fuseable.QueueSubscription<T>, Fuseable, Producer,
+		           OperatorContext<T>,
+		           Receiver {
 
 	/**
 	 * Create a unicast {@link FluxProcessor} that will buffer on a given queue in an
@@ -443,8 +445,13 @@ public final class UnicastProcessor<T>
 	}
 
 	@Override
-	public Subscriber<? super T> downstream() {
+	public Subscriber<? super T> actual() {
 		return actual;
+	}
+
+	@Override
+	public Subscriber<? super T> downstream() {
+		return actual();
 	}
 
 	@Override

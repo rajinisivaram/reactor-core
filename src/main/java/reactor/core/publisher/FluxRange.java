@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 
 import org.reactivestreams.Subscriber;
 import reactor.core.Fuseable;
-import reactor.core.Producer;
 import reactor.core.Trackable;
 
 /**
@@ -69,7 +68,7 @@ final class FluxRange extends Flux<Integer>
 	}
 
 	static final class RangeSubscription
-			implements Trackable, Producer, SynchronousSubscription<Integer> {
+			implements Trackable, SynchronousSubscription<Integer> {
 
 		final Subscriber<? super Integer> actual;
 
@@ -83,7 +82,7 @@ final class FluxRange extends Flux<Integer>
 		static final AtomicLongFieldUpdater<RangeSubscription> REQUESTED =
 		  AtomicLongFieldUpdater.newUpdater(RangeSubscription.class, "requested");
 
-		public RangeSubscription(Subscriber<? super Integer> actual, long start, long end) {
+		RangeSubscription(Subscriber<? super Integer> actual, long start, long end) {
 			this.actual = actual;
 			this.index = start;
 			this.end = end;
@@ -188,11 +187,6 @@ final class FluxRange extends Flux<Integer>
 		}
 
 		@Override
-		public Object downstream() {
-			return actual;
-		}
-
-		@Override
 		public long requestedFromDownstream() {
 			return requested;
 		}
@@ -224,7 +218,7 @@ final class FluxRange extends Flux<Integer>
 	}
 	
 	static final class RangeSubscriptionConditional
-			implements Trackable, Producer, SynchronousSubscription<Integer> {
+			implements Trackable, SynchronousSubscription<Integer> {
 
 		final ConditionalSubscriber<? super Integer> actual;
 
@@ -342,11 +336,6 @@ final class FluxRange extends Flux<Integer>
 		@Override
 		public boolean isTerminated() {
 			return end == index;
-		}
-
-		@Override
-		public Object downstream() {
-			return actual;
 		}
 
 		@Override

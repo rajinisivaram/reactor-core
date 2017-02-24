@@ -31,7 +31,6 @@ import java.util.function.Supplier;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 import reactor.util.Logger;
@@ -648,12 +647,12 @@ public final class WorkQueueProcessor<E> extends EventLoopProcessor<E> {
 	 * parallel coordination of an event.
 	 */
 	final static class QueueSubscriberLoop<T>
-			implements Runnable, Producer, Trackable, Subscription, Receiver {
+			implements Runnable, OperatorContext<T>, Trackable, Subscription, Receiver {
 
 		final AtomicBoolean running = new AtomicBoolean(true);
 
 		final RingBuffer.Sequence
-				sequence = wrap(RingBuffer.INITIAL_CURSOR_VALUE, this);
+				sequence = RingBuffer.newSequence(RingBuffer.INITIAL_CURSOR_VALUE);
 
 		final RingBuffer.Sequence pendingRequest = RingBuffer.newSequence(0);
 
@@ -959,7 +958,7 @@ public final class WorkQueueProcessor<E> extends EventLoopProcessor<E> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return subscriber;
 		}
 

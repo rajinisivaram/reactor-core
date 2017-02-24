@@ -24,7 +24,6 @@ import java.util.function.Consumer;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -68,7 +67,7 @@ final class FluxOnBackpressureBufferStrategy<O> extends FluxSource<O, O> {
 
 	static final class BackpressureBufferDropOldestSubscriber<T>
 			extends ArrayDeque<T>
-			implements Subscriber<T>, Subscription, Trackable, Producer,
+			implements Subscriber<T>, Subscription, Trackable, OperatorContext<T>,
 			           Receiver {
 
 		final Subscriber<? super T>  actual;
@@ -304,7 +303,7 @@ final class FluxOnBackpressureBufferStrategy<O> extends FluxSource<O, O> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

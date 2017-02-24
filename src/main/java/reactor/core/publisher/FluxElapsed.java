@@ -43,7 +43,8 @@ final class FluxElapsed<T> extends FluxSource<T, Tuple2<Long, T>> implements Fus
 	}
 
 	static final class ElapsedSubscriber<T>
-			implements Subscriber<T>, QueueSubscription<Tuple2<Long, T>> {
+			implements Subscriber<T>, OperatorContext<Tuple2<Long, T>>,
+			           QueueSubscription<Tuple2<Long, T>> {
 
 		final Subscriber<? super Tuple2<Long, T>> actual;
 		final TimedScheduler                      scheduler;
@@ -66,6 +67,11 @@ final class FluxElapsed<T> extends FluxSource<T, Tuple2<Long, T>> implements Fus
 				this.s = s;
 				actual.onSubscribe(this);
 			}
+		}
+
+		@Override
+		public Subscriber<? super Tuple2<Long, T>> actual() {
+			return actual;
 		}
 
 		@Override

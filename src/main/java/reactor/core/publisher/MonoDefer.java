@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ final class MonoDefer<T> extends Mono<T> implements Receiver {
 
 		try {
 			p = Objects.requireNonNull(supplier.get(),
-					"The Producer returned by the supplier is null");
+					"The OperatorContext<T> returned by the supplier is null");
 		}
 		catch (Throwable e) {
 			Operators.error(s, Operators.onOperatorError(e));

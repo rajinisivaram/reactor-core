@@ -22,8 +22,6 @@ import java.util.function.Consumer;
 
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import reactor.core.Loopback;
-import reactor.core.Producer;
 import reactor.core.Trackable;
 
 /**
@@ -62,7 +60,7 @@ final class FluxOnBackpressureDrop<T> extends FluxSource<T, T> {
 	}
 
 	static final class DropSubscriber<T>
-			implements Subscriber<T>, Subscription, Producer, Loopback, Trackable {
+			implements Subscriber<T>, Subscription, OperatorContext<T>, Trackable {
 
 		final Subscriber<? super T> actual;
 		final Consumer<? super T>   onDrop;
@@ -76,7 +74,7 @@ final class FluxOnBackpressureDrop<T> extends FluxSource<T, T> {
 
 		boolean done;
 
-		public DropSubscriber(Subscriber<? super T> actual, Consumer<? super T> onDrop) {
+		DropSubscriber(Subscriber<? super T> actual, Consumer<? super T> onDrop) {
 			this.actual = actual;
 			this.onDrop = onDrop;
 		}
@@ -167,18 +165,13 @@ final class FluxOnBackpressureDrop<T> extends FluxSource<T, T> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 
 		@Override
 		public long requestedFromDownstream() {
 			return requested;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return onDrop;
 		}
 
 

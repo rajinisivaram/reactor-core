@@ -97,7 +97,7 @@ final class FluxBufferPredicate<T, C extends Collection<? super T>>
 	static final class BufferPredicateSubscriber<T, C extends Collection<? super T>>
 			extends AbstractQueue<C>
 			implements ConditionalSubscriber<T>, Subscription, Trackable,
-			           BooleanSupplier {
+			           OperatorContext<C>, BooleanSupplier {
 
 		final Subscriber<? super C> actual;
 
@@ -251,6 +251,11 @@ final class FluxBufferPredicate<T, C extends Collection<? super T>>
 				return emit(b);
 			}
 			return true;
+		}
+
+		@Override
+		public Subscriber<? super C> actual() {
+			return actual;
 		}
 
 		@Override

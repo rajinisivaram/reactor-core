@@ -18,7 +18,6 @@ package reactor.core.publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Fuseable;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 
 /**
@@ -39,7 +38,10 @@ final class FluxHide<T> extends FluxSource<T, T> {
 		source.subscribe(new HideSubscriber<>(s));
 	}
 
-	static final class HideSubscriber<T> implements Subscriber<T>, Subscription, Receiver {
+	static final class HideSubscriber<T> implements Subscriber<T>,
+	                                                OperatorContext<T>,
+	                                                Subscription,
+	                                                Receiver {
 		final Subscriber<? super T> actual;
 
 		Subscription s;
@@ -51,6 +53,11 @@ final class FluxHide<T> extends FluxSource<T, T> {
 		@Override
 		public Object upstream() {
 			return s;
+		}
+
+		@Override
+		public Subscriber<? super T> actual() {
+			return actual;
 		}
 
 		@Override
@@ -86,13 +93,13 @@ final class FluxHide<T> extends FluxSource<T, T> {
 	}
 
 	static final class SuppressFuseableSubscriber<T>
-			implements Producer, Receiver, Subscriber<T>, Fuseable.QueueSubscription<T> {
+			implements OperatorContext<T>, Receiver, Subscriber<T>, Fuseable.QueueSubscription<T> {
 
 		final Subscriber<? super T> actual;
 
 		Subscription s;
 
-		public SuppressFuseableSubscriber(Subscriber<? super T> actual) {
+		SuppressFuseableSubscriber(Subscriber<? super T> actual) {
 			this.actual = actual;
 
 		}
@@ -157,7 +164,7 @@ final class FluxHide<T> extends FluxSource<T, T> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

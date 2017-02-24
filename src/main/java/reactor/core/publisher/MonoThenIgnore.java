@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ final class MonoThenIgnore<T> extends Mono<T> implements Fuseable, MultiReceiver
     
     final Mono<T> last;
     
-    public MonoThenIgnore(Mono<?>[] ignore, Mono<T> last) {
+    MonoThenIgnore(Mono<?>[] ignore, Mono<T> last) {
         this.ignore = Objects.requireNonNull(ignore, "ignore");
         this.last = Objects.requireNonNull(last, "last");
     }
@@ -72,7 +72,7 @@ final class MonoThenIgnore<T> extends Mono<T> implements Fuseable, MultiReceiver
      * @param newLast the new last Mono instance
      * @return the new operator set up
      */
-    public <U> MonoThenIgnore<U> shift(Mono<U> newLast) {
+    <U> MonoThenIgnore<U> shift(Mono<U> newLast) {
         Objects.requireNonNull(newLast, "newLast");
         Mono<?>[] a = ignore;
         int n = a.length;

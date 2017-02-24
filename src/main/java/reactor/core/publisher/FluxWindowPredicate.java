@@ -31,7 +31,6 @@ import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
 import reactor.core.Fuseable;
 import reactor.core.MultiProducer;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 import reactor.core.publisher.FluxBufferPredicate.Mode;
@@ -101,7 +100,8 @@ final class FluxWindowPredicate<T> extends FluxSource<T, GroupedFlux<T, T>> impl
 
 	static final class WindowPredicateMain<T>
 			implements Subscriber<T>, Fuseable.QueueSubscription<GroupedFlux<T, T>>,
-			           MultiProducer, Producer, Trackable, Receiver {
+			           MultiProducer, OperatorContext<GroupedFlux<T, T>>, Trackable,
+			           Receiver {
 
 		final Subscriber<? super GroupedFlux<T, T>> actual;
 
@@ -310,7 +310,7 @@ final class FluxWindowPredicate<T> extends FluxSource<T, GroupedFlux<T, T>> impl
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super GroupedFlux<T, T>> actual() {
 			return actual;
 		}
 
@@ -509,7 +509,7 @@ final class FluxWindowPredicate<T> extends FluxSource<T, GroupedFlux<T, T>> impl
 	}
 
 	static final class WindowGroupedFlux<T> extends GroupedFlux<T, T>
-			implements Fuseable, Fuseable.QueueSubscription<T>, Producer, Receiver,
+			implements Fuseable, Fuseable.QueueSubscription<T>, OperatorContext<T>, Receiver,
 			           Trackable {
 
 		final T key;
@@ -846,7 +846,7 @@ final class FluxWindowPredicate<T> extends FluxSource<T, GroupedFlux<T, T>> impl
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

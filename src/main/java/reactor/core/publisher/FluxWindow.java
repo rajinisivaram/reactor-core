@@ -31,7 +31,6 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Disposable;
 import reactor.core.MultiProducer;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -109,7 +108,8 @@ final class FluxWindow<T> extends FluxSource<T, Flux<T>> {
 	}
 
 	static final class WindowExactSubscriber<T>
-			implements Subscriber<T>, Subscription, Disposable, Producer, Receiver,
+			implements Subscriber<T>, Subscription, Disposable, OperatorContext<Flux<T>>,
+			Receiver,
 			           MultiProducer, Trackable {
 
 		final Subscriber<? super Flux<T>> actual;
@@ -240,7 +240,7 @@ final class FluxWindow<T> extends FluxSource<T, Flux<T>> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super Flux<T>> actual() {
 			return actual;
 		}
 
@@ -283,7 +283,7 @@ final class FluxWindow<T> extends FluxSource<T, Flux<T>> {
 
 	static final class WindowSkipSubscriber<T>
 			implements Subscriber<T>, Subscription, Disposable, Receiver, MultiProducer,
-			           Producer, Trackable {
+			           OperatorContext<Flux<T>>, Trackable {
 
 		final Subscriber<? super Flux<T>> actual;
 
@@ -440,7 +440,7 @@ final class FluxWindow<T> extends FluxSource<T, Flux<T>> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super Flux<T>> actual() {
 			return actual;
 		}
 
@@ -482,7 +482,8 @@ final class FluxWindow<T> extends FluxSource<T, Flux<T>> {
 	}
 
 	static final class WindowOverlapSubscriber<T> extends ArrayDeque<UnicastProcessor<T>>
-			implements Subscriber<T>, Subscription, Disposable, Producer, MultiProducer,
+			implements Subscriber<T>, Subscription, Disposable, OperatorContext<Flux<T>>,
+			           MultiProducer,
 			           Receiver, Trackable {
 
 		final Subscriber<? super Flux<T>> actual;
@@ -747,7 +748,7 @@ final class FluxWindow<T> extends FluxSource<T, Flux<T>> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super Flux<T>> actual() {
 			return actual;
 		}
 

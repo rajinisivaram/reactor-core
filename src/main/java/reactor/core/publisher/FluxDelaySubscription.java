@@ -20,7 +20,6 @@ import java.util.Objects;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import reactor.core.Producer;
 
 /**
  * Delays the subscription to the main source until another Publisher
@@ -50,7 +49,7 @@ final class FluxDelaySubscription<T, U> extends FluxSource<T, T> {
 	}
 
 	static final class DelaySubscriptionOtherSubscriber<T, U>
-			extends Operators.DeferredSubscription implements Producer,
+			extends Operators.DeferredSubscription implements OperatorContext<T>,
 			                                                        Subscriber<U> {
 
 		final Publisher<? extends T> source;
@@ -67,7 +66,7 @@ final class FluxDelaySubscription<T, U> extends FluxSource<T, T> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

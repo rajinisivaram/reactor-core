@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,10 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
-import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import reactor.core.Cancellation;
 import reactor.core.Disposable;
 import reactor.core.Fuseable;
-import reactor.core.Loopback;
-import reactor.core.Producer;
 import reactor.core.scheduler.Scheduler;
 
 /**
@@ -67,7 +64,7 @@ final class FluxSubscribeOnValue<T> extends Flux<T> implements Fuseable {
 	}
 
 	static final class ScheduledScalar<T>
-			implements QueueSubscription<T>, Runnable, Producer, Loopback {
+			implements QueueSubscription<T>, Runnable, OperatorContext<T> {
 
 		final Subscriber<? super T> actual;
 
@@ -149,18 +146,8 @@ final class FluxSubscribeOnValue<T> extends Flux<T> implements Fuseable {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return scheduler;
-		}
-
-		@Override
-		public Object connectedOutput() {
-			return value;
 		}
 
 		@Override
@@ -198,7 +185,7 @@ final class FluxSubscribeOnValue<T> extends Flux<T> implements Fuseable {
 	}
 
 	static final class ScheduledEmpty
-			implements QueueSubscription<Void>, Runnable, Producer, Loopback {
+			implements QueueSubscription<Void>, Runnable, OperatorContext {
 
 		final Subscriber<?> actual;
 
@@ -251,7 +238,7 @@ final class FluxSubscribeOnValue<T> extends Flux<T> implements Fuseable {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<?> actual() {
 			return actual;
 		}
 

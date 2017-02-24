@@ -24,10 +24,9 @@ import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
+import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import reactor.core.Loopback;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -47,11 +46,11 @@ final class FluxBuffer<T, C extends Collection<? super T>> extends FluxSource<T,
 
 	final Supplier<C> bufferSupplier;
 
-	FluxBuffer(Flux<? extends T> source, int size, Supplier<C> bufferSupplier) {
+	FluxBuffer(Publisher<? extends T> source, int size, Supplier<C> bufferSupplier) {
 		this(source, size, size, bufferSupplier);
 	}
 
-	FluxBuffer(Flux<? extends T> source,
+	FluxBuffer(Publisher<? extends T> source,
 			int size,
 			int skip,
 			Supplier<C> bufferSupplier) {
@@ -86,7 +85,7 @@ final class FluxBuffer<T, C extends Collection<? super T>> extends FluxSource<T,
 	}
 
 	static final class BufferExactSubscriber<T, C extends Collection<? super T>>
-			implements Subscriber<T>, Subscription, Receiver, Producer, Loopback,
+			implements Subscriber<T>, Subscription, Receiver, OperatorContext<C>,
 			           Trackable {
 
 		final Subscriber<? super C> actual;
@@ -194,18 +193,8 @@ final class FluxBuffer<T, C extends Collection<? super T>> extends FluxSource<T,
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super C> actual() {
 			return actual;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return bufferSupplier;
-		}
-
-		@Override
-		public Object connectedOutput() {
-			return buffer;
 		}
 
 		@Override
@@ -226,7 +215,7 @@ final class FluxBuffer<T, C extends Collection<? super T>> extends FluxSource<T,
 	}
 
 	static final class BufferSkipSubscriber<T, C extends Collection<? super T>>
-			implements Subscriber<T>, Subscription, Receiver, Producer, Loopback,
+			implements Subscriber<T>, Subscription, Receiver, OperatorContext<C>,
 			           Trackable {
 
 		final Subscriber<? super C> actual;
@@ -370,18 +359,8 @@ final class FluxBuffer<T, C extends Collection<? super T>> extends FluxSource<T,
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super C> actual() {
 			return actual;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return bufferSupplier;
-		}
-
-		@Override
-		public Object connectedOutput() {
-			return buffer;
 		}
 
 		@Override
@@ -403,8 +382,9 @@ final class FluxBuffer<T, C extends Collection<? super T>> extends FluxSource<T,
 
 	static final class BufferOverlappingSubscriber<T, C extends Collection<? super T>>
 			extends ArrayDeque<C>
-			implements Subscriber<T>, Subscription, Receiver, BooleanSupplier, Producer,
-			           Trackable, Loopback {
+			implements Subscriber<T>, Subscription, Receiver, BooleanSupplier,
+			           OperatorContext<C>,
+			           Trackable {
 
 		final Subscriber<? super C> actual;
 
@@ -590,18 +570,13 @@ final class FluxBuffer<T, C extends Collection<? super T>> extends FluxSource<T,
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super C> actual() {
 			return actual;
 		}
 
 		@Override
 		public long requestedFromDownstream() {
 			return requested;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return bufferSupplier;
 		}
 
 		@Override

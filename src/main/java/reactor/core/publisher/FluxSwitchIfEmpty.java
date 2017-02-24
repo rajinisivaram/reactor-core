@@ -19,7 +19,6 @@ import java.util.Objects;
 
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
-import reactor.core.Loopback;
 
 /**
  * Switches to another source if the first source turns out to be empty.
@@ -47,13 +46,13 @@ final class FluxSwitchIfEmpty<T> extends FluxSource<T, T> {
 	}
 
 	static final class SwitchIfEmptySubscriber<T>
-			extends Operators.MultiSubscriptionSubscriber<T, T> implements Loopback {
+			extends Operators.MultiSubscriptionSubscriber<T, T> {
 
 		final Publisher<? extends T> other;
 
 		boolean once;
 
-		public SwitchIfEmptySubscriber(Subscriber<? super T> actual,
+		SwitchIfEmptySubscriber(Subscriber<? super T> actual,
 				Publisher<? extends T> other) {
 			super(actual);
 			this.other = other;
@@ -78,16 +77,6 @@ final class FluxSwitchIfEmpty<T> extends FluxSource<T, T> {
 			else {
 				subscriber.onComplete();
 			}
-		}
-
-		@Override
-		public Object connectedInput() {
-			return null;
-		}
-
-		@Override
-		public Object connectedOutput() {
-			return other;
 		}
 	}
 }

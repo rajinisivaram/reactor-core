@@ -13,26 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package reactor.core.publisher;
 
-package reactor.core;
+import org.reactivestreams.Subscriber;
+import reactor.util.Context;
 
 /**
- * A component that is forking to a sub-flow given a delegate input and that is consuming from a given delegate output
+ * @author Stephane Maldini
  */
-@Deprecated
-public interface Loopback {
+public interface OperatorContext<T> {
 
-	/**
-	 * @return component delegated to for incoming data or {@code null} if unavailable
-	 */
-	default Object connectedInput() {
-		return null;
-	}
+	Subscriber<? super T> actual();
 
-	/**
-	 * @return component delegated to for outgoing data or {@code null} if unavailable
-	 */
-	default Object connectedOutput() {
-		return null;
+	@SuppressWarnings("unchecked")
+	default void onContext(Context context) {
+		Subscriber<? super T> a = actual();
+		if(a != this && a instanceof OperatorContext){
+			((OperatorContext)a).onContext(context);
+		}
 	}
 }

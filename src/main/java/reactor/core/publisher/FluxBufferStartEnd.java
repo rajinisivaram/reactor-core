@@ -89,7 +89,7 @@ final class FluxBufferStartEnd<T, U, V, C extends Collection<? super T>>
 	}
 
 	static final class BufferStartEndMainSubscriber<T, U, V, C extends Collection<? super T>>
-			implements Subscriber<T>, Subscription {
+			implements Subscriber<T>, OperatorContext<C>, Subscription {
 
 		final Subscriber<? super C> actual;
 
@@ -467,6 +467,11 @@ final class FluxBufferStartEnd<T, U, V, C extends Collection<? super T>>
 			}
 			return false;
 		}
+
+		@Override
+		public Subscriber<? super C> actual() {
+			return actual;
+		}
 	}
 
 	static final class BufferStartEndStarter<U> extends Operators.DeferredSubscription
@@ -474,7 +479,7 @@ final class FluxBufferStartEnd<T, U, V, C extends Collection<? super T>>
 
 		final BufferStartEndMainSubscriber<?, U, ?, ?> main;
 
-		public BufferStartEndStarter(BufferStartEndMainSubscriber<?, U, ?, ?> main) {
+		BufferStartEndStarter(BufferStartEndMainSubscriber<?, U, ?, ?> main) {
 			this.main = main;
 		}
 
@@ -510,7 +515,7 @@ final class FluxBufferStartEnd<T, U, V, C extends Collection<? super T>>
 
 		final long index;
 
-		public BufferStartEndEnder(BufferStartEndMainSubscriber<T, ?, V, C> main,
+		BufferStartEndEnder(BufferStartEndMainSubscriber<T, ?, V, C> main,
 				C buffer,
 				long index) {
 			this.main = main;

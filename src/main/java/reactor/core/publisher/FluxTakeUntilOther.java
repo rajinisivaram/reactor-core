@@ -59,7 +59,7 @@ final class FluxTakeUntilOther<T, U> extends FluxSource<T, T> {
 
 		boolean once;
 
-		public TakeUntilOtherSubscriber(TakeUntilMainSubscriber<?> main) {
+		TakeUntilOtherSubscriber(TakeUntilMainSubscriber<?> main) {
 			this.main = main;
 		}
 
@@ -96,7 +96,9 @@ final class FluxTakeUntilOther<T, U> extends FluxSource<T, T> {
 
 	}
 
-	static final class TakeUntilMainSubscriber<T> implements Subscriber<T>, Subscription {
+	static final class TakeUntilMainSubscriber<T> implements Subscriber<T>,
+	                                                         OperatorContext<T>,
+	                                                         Subscription {
 		final Subscriber<T> actual;
 
 		volatile Subscription main;
@@ -109,8 +111,13 @@ final class FluxTakeUntilOther<T, U> extends FluxSource<T, T> {
 		static final AtomicReferenceFieldUpdater<TakeUntilMainSubscriber, Subscription> OTHER =
 		  AtomicReferenceFieldUpdater.newUpdater(TakeUntilMainSubscriber.class, Subscription.class, "other");
 
-		public TakeUntilMainSubscriber(Subscriber<? super T> actual) {
+		TakeUntilMainSubscriber(Subscriber<? super T> actual) {
 			this.actual = Operators.serialize(actual);
+		}
+
+		@Override
+		public Subscriber<? super T> actual() {
+			return actual;
 		}
 
 		void setOther(Subscription s) {

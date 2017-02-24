@@ -32,7 +32,6 @@ import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
 import reactor.core.Fuseable;
 import reactor.core.MultiProducer;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -94,7 +93,7 @@ final class FluxGroupBy<T, K, V> extends FluxSource<T, GroupedFlux<K, V>>
 
 	static final class GroupByMain<T, K, V>
 			implements Subscriber<T>, QueueSubscription<GroupedFlux<K, V>>, MultiProducer,
-			           Producer, Trackable, Receiver {
+			           OperatorContext<GroupedFlux<K, V>>, Trackable, Receiver {
 
 		final Function<? super T, ? extends K> keySelector;
 
@@ -279,7 +278,7 @@ final class FluxGroupBy<T, K, V> extends FluxSource<T, GroupedFlux<K, V>>
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super GroupedFlux<K, V>> actual() {
 			return actual;
 		}
 
@@ -496,7 +495,8 @@ final class FluxGroupBy<T, K, V> extends FluxSource<T, GroupedFlux<K, V>>
 	}
 
 	static final class UnicastGroupedFlux<K, V> extends GroupedFlux<K, V>
-			implements Fuseable, QueueSubscription<V>, Producer, Receiver, Trackable {
+			implements Fuseable, QueueSubscription<V>, OperatorContext<V>, Receiver,
+			           Trackable {
 
 		final K key;
 
@@ -825,7 +825,7 @@ final class FluxGroupBy<T, K, V> extends FluxSource<T, GroupedFlux<K, V>>
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super V> actual() {
 			return actual;
 		}
 

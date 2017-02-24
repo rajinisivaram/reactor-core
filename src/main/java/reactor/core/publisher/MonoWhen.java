@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ final class MonoWhen<T, R> extends Mono<R> {
 	final Function<? super Object[], ? extends R> zipper;
 
 	@SuppressWarnings("unchecked")
-	public <U> MonoWhen(boolean delayError,
+	<U> MonoWhen(boolean delayError,
 			Publisher<? extends T> p1,
 			Publisher<? extends U> p2,
 			BiFunction<? super T, ? super U, ? extends R> zipper2) {
@@ -55,7 +55,7 @@ final class MonoWhen<T, R> extends Mono<R> {
 				Objects.requireNonNull(p2, "p2"));
 	}
 
-    public MonoWhen(boolean delayError,
+	MonoWhen(boolean delayError,
 		    Function<? super Object[], ? extends R> zipper,
 		    Publisher<?>... sources) {
 	    this.delayError = delayError;
@@ -64,7 +64,7 @@ final class MonoWhen<T, R> extends Mono<R> {
         this.sourcesIterable = null;
     }
 
-	public MonoWhen(boolean delayError,
+	MonoWhen(boolean delayError,
 			Function<? super Object[], ? extends R> zipper,
 			Iterable<? extends Publisher<?>> sourcesIterable) {
 		this.delayError = delayError;
@@ -74,7 +74,7 @@ final class MonoWhen<T, R> extends Mono<R> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Mono<R> whenAdditionalSource(Publisher source, BiFunction zipper) {
+	Mono<R> whenAdditionalSource(Publisher source, BiFunction zipper) {
 		Publisher[] oldSources = sources;
 		if (oldSources != null && this.zipper instanceof FluxZip.PairwiseZipper) {
 			int oldLen = oldSources.length;
@@ -136,7 +136,7 @@ final class MonoWhen<T, R> extends Mono<R> {
                 AtomicIntegerFieldUpdater.newUpdater(MonoWhenCoordinator.class, "done");
 
         @SuppressWarnings("unchecked")
-        public MonoWhenCoordinator(Subscriber<? super R> subscriber,
+        MonoWhenCoordinator(Subscriber<? super R> subscriber,
 		        int n,
 		        boolean delayError,
 		        Function<? super Object[], ? extends R> zipper) {
@@ -250,7 +250,7 @@ final class MonoWhen<T, R> extends Mono<R> {
         Object value;
         Throwable error;
 
-		public MonoWhenSubscriber(MonoWhenCoordinator<R> parent) {
+		MonoWhenSubscriber(MonoWhenCoordinator<R> parent) {
 			this.parent = parent;
         }
         

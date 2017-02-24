@@ -23,7 +23,6 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
 import reactor.core.Fuseable;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 
 /**
@@ -87,7 +86,7 @@ final class FluxPeekFuseable<T> extends FluxSource<T, T>
 	}
 
 	static final class PeekFuseableSubscriber<T>
-			implements Subscriber<T>, Receiver, Producer, SynchronousSubscription<T> {
+			implements Subscriber<T>, Receiver, OperatorContext<T>, SynchronousSubscription<T> {
 
 		final Subscriber<? super T> actual;
 
@@ -255,7 +254,7 @@ final class FluxPeekFuseable<T> extends FluxSource<T, T>
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 
@@ -320,7 +319,7 @@ final class FluxPeekFuseable<T> extends FluxSource<T, T>
 	}
 
 	static final class PeekFuseableConditionalSubscriber<T>
-			implements ConditionalSubscriber<T>, Receiver, Producer,
+			implements ConditionalSubscriber<T>, Receiver, OperatorContext<T>,
 			           SynchronousSubscription<T> {
 
 		final ConditionalSubscriber<? super T> actual;
@@ -507,7 +506,7 @@ final class FluxPeekFuseable<T> extends FluxSource<T, T>
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 
@@ -607,7 +606,7 @@ final class FluxPeekFuseable<T> extends FluxSource<T, T>
 	}
 
 	static final class PeekConditionalSubscriber<T>
-			implements ConditionalSubscriber<T>, Subscription, Receiver, Producer {
+			implements ConditionalSubscriber<T>, Subscription, Receiver, OperatorContext<T> {
 
 		final ConditionalSubscriber<? super T> actual;
 
@@ -780,7 +779,7 @@ final class FluxPeekFuseable<T> extends FluxSource<T, T>
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

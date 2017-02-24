@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,11 @@ package reactor.core;
 
 /**
  * A component that will emit events to a downstream.
+ * @deprecated This introspection interface is no longer used internally. See
+ * {@link reactor.core.publisher.OperatorContext} that is now replacing Producer in a
+ * more precised way.
  */
+@Deprecated
 public interface Producer {
 
 	/**

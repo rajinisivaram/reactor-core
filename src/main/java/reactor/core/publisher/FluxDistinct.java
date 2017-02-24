@@ -26,8 +26,6 @@ import org.reactivestreams.Subscription;
 import reactor.core.Fuseable;
 import reactor.core.Fuseable.ConditionalSubscriber;
 import reactor.core.Fuseable.QueueSubscription;
-import reactor.core.Loopback;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -81,7 +79,7 @@ final class FluxDistinct<T, K, C extends Collection<? super K>> extends FluxSour
 	}
 
 	static final class DistinctSubscriber<T, K, C extends Collection<? super K>>
-			implements ConditionalSubscriber<T>, Receiver, Producer, Loopback,
+			implements ConditionalSubscriber<T>, Receiver, OperatorContext<T>,
 			           Subscription, Trackable {
 
 		final Subscriber<? super T> actual;
@@ -187,13 +185,8 @@ final class FluxDistinct<T, K, C extends Collection<? super K>> extends FluxSour
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return keyExtractor;
 		}
 
 		@Override
@@ -213,7 +206,7 @@ final class FluxDistinct<T, K, C extends Collection<? super K>> extends FluxSour
 	}
 
 	static final class DistinctConditionalSubscriber<T, K, C extends Collection<? super K>>
-			implements ConditionalSubscriber<T>, Receiver, Producer, Loopback,
+			implements ConditionalSubscriber<T>, Receiver, OperatorContext<T>,
 			           Subscription, Trackable {
 
 		final ConditionalSubscriber<? super T> actual;
@@ -344,13 +337,8 @@ final class FluxDistinct<T, K, C extends Collection<? super K>> extends FluxSour
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return keyExtractor;
 		}
 
 		@Override
@@ -370,7 +358,7 @@ final class FluxDistinct<T, K, C extends Collection<? super K>> extends FluxSour
 	}
 
 	static final class DistinctFuseableSubscriber<T, K, C extends Collection<? super K>>
-			implements ConditionalSubscriber<T>, Receiver, Producer, Loopback,
+			implements ConditionalSubscriber<T>, Receiver, OperatorContext<T>,
 			           QueueSubscription<T>, Trackable {
 
 		final Subscriber<? super T> actual;
@@ -484,13 +472,8 @@ final class FluxDistinct<T, K, C extends Collection<? super K>> extends FluxSour
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return keyExtractor;
 		}
 
 		@Override

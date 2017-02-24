@@ -25,7 +25,6 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
 import reactor.core.Fuseable;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 import reactor.util.concurrent.QueueSupplier;
@@ -69,7 +68,7 @@ final class FluxOnBackpressureBuffer<O> extends FluxSource<O, O> implements Fuse
 	}
 
 	static final class BackpressureBufferSubscriber<T>
-			implements Subscriber<T>, QueueSubscription<T>, Trackable, Producer,
+			implements Subscriber<T>, QueueSubscription<T>, Trackable, OperatorContext<T>,
 			           Receiver {
 
 		final Subscriber<? super T> actual;
@@ -351,7 +350,7 @@ final class FluxOnBackpressureBuffer<O> extends FluxSource<O, O> implements Fuse
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Cancellation;
 import reactor.core.Exceptions;
-import reactor.core.Producer;
 import reactor.core.Trackable;
 import reactor.core.publisher.FluxSink.OverflowStrategy;
 import reactor.util.concurrent.QueueSupplier;
@@ -113,7 +112,7 @@ final class FluxCreate<T> extends Flux<T> {
 
 		volatile boolean done;
 
-		public SerializedSink(BaseSink<T> sink) {
+		SerializedSink(BaseSink<T> sink) {
 			this.sink = sink;
 			this.queue = QueueSupplier.<T>unbounded(QueueSupplier.XS_BUFFER_SIZE).get();
 		}
@@ -250,7 +249,7 @@ final class FluxCreate<T> extends Flux<T> {
 	}
 
 	static abstract class BaseSink<T>
-			implements FluxSink<T>, Subscription, Trackable, Producer {
+			implements FluxSink<T>, Subscription, Trackable, OperatorContext<T> {
 
 		final Subscriber<? super T> actual;
 
@@ -344,7 +343,7 @@ final class FluxCreate<T> extends Flux<T> {
 		}
 
 		@Override
-		public Subscriber<? super T> downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
 		}
 
@@ -365,7 +364,7 @@ final class FluxCreate<T> extends Flux<T> {
 
 	static final class IgnoreSink<T> extends BaseSink<T> {
 
-		public IgnoreSink(Subscriber<? super T> actual) {
+		IgnoreSink(Subscriber<? super T> actual) {
 			super(actual);
 		}
 
@@ -413,7 +412,7 @@ final class FluxCreate<T> extends Flux<T> {
 
 	static final class DropAsyncSink<T> extends NoOverflowBaseAsyncSink<T> {
 
-		public DropAsyncSink(Subscriber<? super T> actual) {
+		DropAsyncSink(Subscriber<? super T> actual) {
 			super(actual);
 		}
 
@@ -426,7 +425,7 @@ final class FluxCreate<T> extends Flux<T> {
 
 	static final class ErrorAsyncSink<T> extends NoOverflowBaseAsyncSink<T> {
 
-		public ErrorAsyncSink(Subscriber<? super T> actual) {
+		ErrorAsyncSink(Subscriber<? super T> actual) {
 			super(actual);
 		}
 

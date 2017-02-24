@@ -38,13 +38,14 @@ final class FluxDetach<T> extends FluxSource<T, T> {
 		source.subscribe(new DetachSubscriber<>(s));
 	}
 	
-	static final class DetachSubscriber<T> implements Subscriber<T>, Subscription {
+	static final class DetachSubscriber<T> implements Subscriber<T>,
+	                                                  OperatorContext<T>, Subscription {
 		
 		Subscriber<? super T> actual;
 		
 		Subscription s;
 
-		public DetachSubscriber(Subscriber<? super T> actual) {
+		DetachSubscriber(Subscriber<? super T> actual) {
 			this.actual = actual;
 		}
 		
@@ -75,7 +76,12 @@ final class FluxDetach<T> extends FluxSource<T, T> {
 				a.onError(t);
 			}
 		}
-		
+
+		@Override
+		public Subscriber<? super T> actual() {
+			return actual;
+		}
+
 		@Override
 		public void onComplete() {
 			Subscriber<? super T> a = actual;

@@ -22,7 +22,6 @@ import java.util.function.Function;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import reactor.core.Loopback;
 
 /**
  * Resumes the failed main sequence with another sequence returned by
@@ -48,13 +47,13 @@ final class FluxResume<T> extends FluxSource<T, T> {
 	}
 
 	static final class ResumeSubscriber<T>
-			extends Operators.MultiSubscriptionSubscriber<T, T> implements Loopback {
+			extends Operators.MultiSubscriptionSubscriber<T, T> {
 
 		final Function<? super Throwable, ? extends Publisher<? extends T>> nextFactory;
 
 		boolean second;
 
-		public ResumeSubscriber(Subscriber<? super T> actual,
+		ResumeSubscriber(Subscriber<? super T> actual,
 				Function<? super Throwable, ? extends Publisher<? extends T>> nextFactory) {
 			super(actual);
 			this.nextFactory = nextFactory;
@@ -102,12 +101,6 @@ final class FluxResume<T> extends FluxSource<T, T> {
 				subscriber.onError(t);
 			}
 		}
-
-		@Override
-		public Object connectedInput() {
-			return nextFactory;
-		}
-
 
 	}
 }

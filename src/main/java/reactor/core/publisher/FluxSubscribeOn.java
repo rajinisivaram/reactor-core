@@ -22,8 +22,6 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import reactor.core.Loopback;
-import reactor.core.Producer;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Scheduler.Worker;
 
@@ -35,7 +33,7 @@ import reactor.core.scheduler.Scheduler.Worker;
  * @param <T> the value type
  * @see <a href="https://github.com/reactor/reactive-streams-commons">Reactive-Streams-Commons</a>
  */
-final class FluxSubscribeOn<T> extends FluxSource<T, T> implements Loopback {
+final class FluxSubscribeOn<T> extends FluxSource<T, T> {
 
 	final Scheduler scheduler;
 	
@@ -67,13 +65,8 @@ final class FluxSubscribeOn<T> extends FluxSource<T, T> implements Loopback {
 		}
 	}
 
-	@Override
-	public Object connectedInput() {
-		return scheduler;
-	}
-
 	static final class SubscribeOnSubscriber<T>
-			implements Subscription, Subscriber<T>, Producer, Loopback, Runnable {
+			implements Subscription, Subscriber<T>, OperatorContext<T>, Runnable {
 
 		final Subscriber<? super T> actual;
 
@@ -195,18 +188,8 @@ final class FluxSubscribeOn<T> extends FluxSource<T, T> implements Loopback {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
-		}
-
-		@Override
-		public Object connectedOutput() {
-			return worker;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return null;
 		}
 
 	}

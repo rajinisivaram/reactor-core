@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 Pivotal Software Inc, All Rights Reserved.
+ * Copyright (c) 2011-2017 Pivotal Software Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ final class FluxJust<T> extends Flux<T> implements Fuseable.ScalarCallable<T>, F
 
 	final T value;
 
-	public FluxJust(T value) {
+	FluxJust(T value) {
 		this.value = Objects.requireNonNull(value, "value");
 	}
 
@@ -85,7 +85,7 @@ final class FluxJust<T> extends Flux<T> implements Fuseable.ScalarCallable<T>, F
 		final T                     value;
 		final Subscriber<? super T> subscriber;
 
-		public WeakScalarSubscription(T value, Subscriber<? super T> subscriber) {
+		WeakScalarSubscription(T value, Subscriber<? super T> subscriber) {
 			this.value = value;
 			this.subscriber = subscriber;
 		}

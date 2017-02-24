@@ -54,6 +54,7 @@ import reactor.core.publisher.FluxSink.OverflowStrategy;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 import reactor.core.scheduler.TimedScheduler;
+import reactor.util.Context;
 import reactor.util.Logger;
 import reactor.util.concurrent.QueueSupplier;
 import reactor.util.function.Tuple2;
@@ -1244,7 +1245,7 @@ public abstract class Flux<T> implements Publisher<T> {
 	 * @return a {@link FluxProcessor} accepting publishers and producing T
 	 */
 	public static <T> Flux<T> switchOnNext(Publisher<? extends Publisher<? extends T>> mergedPublishers, int prefetch) {
-		return onAssembly(new FluxSwitchMap<>(Flux.from(mergedPublishers),
+		return onAssembly(new FluxSwitchMap<>(mergedPublishers,
 				identityFunction(),
 				QueueSupplier.unbounded(prefetch), prefetch));
 	}
@@ -1613,7 +1614,7 @@ public abstract class Flux<T> implements Publisher<T> {
 			Publisher<?>> sources,
 			final Function<? super TUPLE, ? extends V> combinator) {
 
-		return onAssembly(new FluxBuffer<>(from(sources), Integer.MAX_VALUE, listSupplier())
+		return onAssembly(new FluxBuffer<>(sources, Integer.MAX_VALUE, listSupplier())
 		                    .flatMap(new Function<List<? extends Publisher<?>>, Publisher<V>>() {
 			                    @Override
 			                    public Publisher<V> apply(List<? extends Publisher<?>> publishers) {
@@ -2932,6 +2933,19 @@ public abstract class Flux<T> implements Publisher<T> {
 			return fluxConcatArray.concatAdditionalSourceLast(other);
 		}
 		return concat(this, other);
+	}
+
+	/**
+	 * Inject or reuse a parent {@link Context}.
+	 *
+	 * @param doOnContext the bifunction taking a previous {@link Context} state
+	 * (read-only) and a candidate new on (read/write).
+	 *
+	 * @return a concatenated {@link Flux}
+	 */
+	public final Flux<T> contextualize(BiFunction<Context, Context, Context>
+			doOnContext) {
+		return new FluxContextualize<>(this, doOnContext);
 	}
 
 	/**

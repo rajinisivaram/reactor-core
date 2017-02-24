@@ -36,7 +36,6 @@ import org.reactivestreams.Subscription;
 import reactor.core.Disposable;
 import reactor.core.Exceptions;
 import reactor.core.MultiReceiver;
-import reactor.core.Producer;
 import reactor.core.Trackable;
 import reactor.core.publisher.FluxGroupJoin.JoinSupport;
 import reactor.core.publisher.FluxGroupJoin.LeftRightEndSubscriber;
@@ -95,7 +94,8 @@ final class FluxJoin<TLeft, TRight, TLeftEnd, TRightEnd, R> extends FluxSource<T
 	}
 
 	static final class GroupJoinSubscription<TLeft, TRight, TLeftEnd, TRightEnd, R>
-			implements Subscription, JoinSupport, Trackable, MultiReceiver, Producer {
+			implements Subscription, JoinSupport, Trackable, MultiReceiver,
+			           OperatorContext<R> {
 
 		final Subscriber<? super R> actual;
 
@@ -179,7 +179,7 @@ final class FluxJoin<TLeft, TRight, TLeftEnd, TRightEnd, R> extends FluxSource<T
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super R> actual() {
 			return actual;
 		}
 

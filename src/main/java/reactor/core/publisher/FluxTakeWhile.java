@@ -20,8 +20,6 @@ import java.util.function.Predicate;
 
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import reactor.core.Loopback;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -47,7 +45,7 @@ final class FluxTakeWhile<T> extends FluxSource<T, T> {
 	}
 
 	static final class TakeWhileSubscriber<T>
-			implements Subscriber<T>, Producer, Receiver, Loopback, Subscription,
+			implements Subscriber<T>, OperatorContext<T>, Receiver, Subscription,
 			           Trackable {
 		final Subscriber<? super T> actual;
 
@@ -57,7 +55,7 @@ final class FluxTakeWhile<T> extends FluxSource<T, T> {
 
 		boolean done;
 
-		public TakeWhileSubscriber(Subscriber<? super T> actual, Predicate<? super T> predicate) {
+		TakeWhileSubscriber(Subscriber<? super T> actual, Predicate<? super T> predicate) {
 			this.actual = actual;
 			this.predicate = predicate;
 		}
@@ -130,13 +128,8 @@ final class FluxTakeWhile<T> extends FluxSource<T, T> {
 		}
 
 		@Override
-		public Object downstream() {
+		public Subscriber<? super T> actual() {
 			return actual;
-		}
-
-		@Override
-		public Object connectedInput() {
-			return predicate;
 		}
 
 		@Override

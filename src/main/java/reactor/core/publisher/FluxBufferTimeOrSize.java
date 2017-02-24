@@ -42,19 +42,20 @@ final class FluxBufferTimeOrSize<T, C extends Collection<? super T>> extends Flu
 
 	@Override
 	public void subscribe(Subscriber<? super C> subscriber) {
-		source.subscribe(new BufferAction<>(prepareSub(subscriber),
+		source.subscribe(new BufferTimeoutSubscriber<>(prepareSub(subscriber),
 				batchSize,
 				timespan,
 				timer.createWorker(),
 				bufferSupplier));
 	}
 
-	final static class BufferAction<T, C extends Collection<? super T>> extends BatchAction<T, C> {
+	final static class BufferTimeoutSubscriber<T, C extends Collection<? super T>> extends
+	                                                                               BatchSubscriber<T, C> {
 
 		final Supplier<C> bufferSupplier;
 		volatile C values;
 
-		public BufferAction(Subscriber<? super C> actual,
+		BufferTimeoutSubscriber(Subscriber<? super C> actual,
 				int maxSize,
 				long timespan,
 				TimedScheduler.TimedWorker timer,

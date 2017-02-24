@@ -32,7 +32,6 @@ import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
 import reactor.core.Fuseable;
 import reactor.core.MultiReceiver;
-import reactor.core.Producer;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
 
@@ -565,7 +564,7 @@ final class FluxCombineLatest<T, R> extends Flux<R> implements MultiReceiver, Fu
 	}
 
 	static final class CombineLatestInner<T>
-			implements Subscriber<T>, Receiver, Producer, Trackable {
+			implements Subscriber<T>, Receiver, Trackable {
 
 		final CombineLatestCoordinator<T, ?> parent;
 
@@ -630,11 +629,6 @@ final class FluxCombineLatest<T, R> extends Flux<R> implements MultiReceiver, Fu
 				produced = p;
 			}
 
-		}
-
-		@Override
-		public Object downstream() {
-			return parent;
 		}
 
 		@Override
