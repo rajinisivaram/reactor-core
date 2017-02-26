@@ -24,7 +24,7 @@ import reactor.core.Disposable;
 import reactor.core.Exceptions;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
-import reactor.util.Context;
+import reactor.util.context.Context;
 
 /**
  * A simple base class for a {@link Subscriber} implementation that lets the user
@@ -63,7 +63,7 @@ public abstract class BaseSubscriber<T> implements Subscriber<T>, Subscription, 
 	}
 
 	@Override
-	public final void onContext(Context context) {
+	public final void pushContext(Context context) {
 		hookOnContext(context);
 	}
 

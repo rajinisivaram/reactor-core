@@ -13,14 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package reactor.util;
+package reactor.util.context;
 
-/**
- * @author Stephane Maldini
- */
-public interface Context {
+import java.util.Objects;
 
-	Context put(Object key, Object value);
+import reactor.util.function.Tuples;
 
-	<T> T get(Object key);
+final class EmptyContext implements Context {
+
+	static final EmptyContext INSTANCE = new EmptyContext();
+
+	@Override
+	public Context put(Object key, Object value) {
+		Objects.requireNonNull(key, "key");
+		return new SingleContext(key, value);
+	}
+
+	@Override
+	public <T> T get(Object key) {
+		return null;
+	}
 }

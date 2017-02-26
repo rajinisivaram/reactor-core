@@ -16,8 +16,6 @@
 
 package reactor.core.publisher;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import java.util.function.BiFunction;
@@ -26,9 +24,7 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
 import reactor.core.Fuseable;
-import reactor.util.Context;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
+import reactor.util.context.Context;
 
 final class FluxContextualize<T> extends FluxSource<T, T> implements Fuseable {
 
@@ -43,72 +39,8 @@ final class FluxContextualize<T> extends FluxSource<T, T> implements Fuseable {
 	@Override
 	public void subscribe(Subscriber<? super T> s) {
 		ContextualizeSubscriber<T> cs = new ContextualizeSubscriber<>(s, doOnContext);
+
 		source.subscribe(cs);
-		if (cs.context == ContextualizeSubscriber.EMPTY) {
-			cs.onContext(EmptyContext.INSTANCE);
-		}
-	}
-
-	static final class EmptyContext implements Context {
-
-		static final EmptyContext INSTANCE = new EmptyContext();
-
-		@Override
-		public Context put(Object key, Object value) {
-			Objects.requireNonNull(key, "key");
-			return new SingleContext(Tuples.of(key, value));
-		}
-
-		@Override
-		public <T> T get(Object key) {
-			return null;
-		}
-	}
-
-	static final class SingleContext implements Context {
-		final Tuple2<Object, Object> pair;
-
-		SingleContext(Tuple2<Object, Object> pair) {
-			this.pair = pair;
-		}
-
-		@Override
-		public Context put(Object key, Object value) {
-			Objects.requireNonNull(key, "key");
-			Map<Object, Object> m = new HashMap<>(2, 1f);
-			m.put(pair.getT1(), pair.getT2());
-			m.put(key, value);
-			return new MultiContext(m);
-		}
-
-		@Override
-		@SuppressWarnings("unchecked")
-		public <T> T get(Object key) {
-			return pair.getT1().equals(key) ? (T)pair.getT2() : null;
-		}
-	}
-
-	static final class MultiContext implements Context {
-		final Map<Object, Object> map;
-
-		MultiContext(Map<Object, Object> map) {
-			this.map = map;
-		}
-
-		@Override
-		public Context put(Object key, Object value) {
-			Objects.requireNonNull(key, "key");
-			Map<Object, Object> m = new HashMap<>(map.size() + 1, 1f);
-			m.putAll(map);
-			m.put(key, value);
-			return new MultiContext(m);
-		}
-
-		@Override
-		@SuppressWarnings("unchecked")
-		public <T> T get(Object key) {
-			return (T)map.get(key);
-		}
 	}
 
 	static final class ContextualizeSubscriber<T>
@@ -127,7 +59,17 @@ final class FluxContextualize<T> extends FluxSource<T, T> implements Fuseable {
 						Context.class,
 						"context");
 
-		static final Context EMPTY = new EmptyContext();
+		static final Context EMPTY = new Context() {
+			@Override
+			public Context put(Object key, Object value) {
+				return Context.empty().put(key, value);
+			}
+
+			@Override
+			public <X> X get(Object key) {
+				return null;
+			}
+		};
 
 		QueueSubscription<T> qs;
 		Subscription         s;
@@ -147,7 +89,7 @@ final class FluxContextualize<T> extends FluxSource<T, T> implements Fuseable {
 		}
 
 		@Override
-		public void onContext(Context context) {
+		public void pushContext(Context context) {
 			try {
 				if(this.context == EMPTY){
 					context = doOnContext.apply(context, EMPTY);
@@ -156,7 +98,9 @@ final class FluxContextualize<T> extends FluxSource<T, T> implements Fuseable {
 					context = doOnContext.apply(this.context, context);
 				}
 				this.context = context;
-				OperatorContext.super.onContext(context);
+				if(context != EMPTY && context != Context.empty()) {
+					OperatorContext.super.pushContext(context);
+				}
 			}
 			catch (Throwable t) {
 				Exceptions.throwIfFatal(t);
@@ -173,6 +117,9 @@ final class FluxContextualize<T> extends FluxSource<T, T> implements Fuseable {
 					this.qs = (QueueSubscription<T>) s;
 				}
 
+				if (context == ContextualizeSubscriber.EMPTY) {
+					pushContext(pullContext());
+				}
 				actual.onSubscribe(this);
 			}
 		}

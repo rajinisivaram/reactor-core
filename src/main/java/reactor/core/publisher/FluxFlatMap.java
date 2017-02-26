@@ -35,7 +35,7 @@ import reactor.core.Fuseable;
 import reactor.core.MultiReceiver;
 import reactor.core.Receiver;
 import reactor.core.Trackable;
-import reactor.util.Context;
+import reactor.util.context.Context;
 
 /**
  * Maps a sequence of values each into a Publisher and flattens them
@@ -202,6 +202,8 @@ final class FluxFlatMap<T, R> extends FluxSource<T, R> {
 
 		final int limit;
 
+		Context context;
+
 		volatile Queue<R> scalarQueue;
 
 		volatile Throwable error;
@@ -252,6 +254,20 @@ final class FluxFlatMap<T, R> extends FluxSource<T, R> {
 			this.prefetch = prefetch;
 			this.innerQueueSupplier = innerQueueSupplier;
 			this.limit = maxConcurrency - (maxConcurrency >> 2);
+		}
+
+		@Override
+		public void pushContext(Context context) {
+			this.context = context;
+			OperatorContext.super.pushContext(context);
+		}
+
+		@Override
+		public Context pullContext() {
+			if(context == null){
+				this.context = OperatorContext.super.pullContext();
+			}
+			return context;
 		}
 
 		@SuppressWarnings("unchecked")
@@ -914,7 +930,7 @@ final class FluxFlatMap<T, R> extends FluxSource<T, R> {
 		}
 
 		@Override
-		public void onContext(Context context) {
+		public void pushContext(Context context) {
 			//IGNORE
 		}
 

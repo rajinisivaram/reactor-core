@@ -16,20 +16,32 @@
 package reactor.core.publisher;
 
 import org.reactivestreams.Subscriber;
-import reactor.util.Context;
+import reactor.util.context.Context;
+import reactor.util.context.ContextStage;
 
 /**
  * @author Stephane Maldini
  */
-public interface OperatorContext<T> {
+public interface OperatorContext<T> extends ContextStage {
 
 	Subscriber<? super T> actual();
 
 	@SuppressWarnings("unchecked")
-	default void onContext(Context context) {
+	@Override
+	default void pushContext(Context context) {
 		Subscriber<? super T> a = actual();
-		if(a != this && a instanceof OperatorContext){
-			((OperatorContext)a).onContext(context);
+		if(a != this && a instanceof ContextStage){
+			((ContextStage)a).pushContext(context);
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	default Context pullContext() {
+		Subscriber<? super T> a = actual();
+		if(a != this && a instanceof ContextStage){
+			return ((ContextStage)a).pullContext();
+		}
+		return Context.empty();
 	}
 }

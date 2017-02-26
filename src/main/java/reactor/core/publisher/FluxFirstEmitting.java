@@ -26,7 +26,7 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.MultiReceiver;
 import reactor.core.Trackable;
-import reactor.util.Context;
+import reactor.util.context.Context;
 
 /**
  * Given a set of source Publishers the values of that Publisher is forwarded to the
@@ -298,7 +298,7 @@ final class FluxFirstEmitting<T> extends Flux<T> implements MultiReceiver {
 		boolean won;
 
 		@Override
-		public void onContext(Context context) {
+		public void pushContext(Context context) {
 			//IGNORE
 		}
 
