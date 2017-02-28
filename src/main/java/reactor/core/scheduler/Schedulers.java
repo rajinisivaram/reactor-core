@@ -355,7 +355,7 @@ public abstract class Schedulers {
 	public static Scheduler newTimer(String name, boolean daemon) {
 		return newTimer(new SchedulerThreadFactory(name,
 				daemon,
-				SingleTimedScheduler.COUNTER));
+				SingleScheduler.TIMER_COUNTER));
 	}
 
 	/**
@@ -572,7 +572,7 @@ public abstract class Schedulers {
 		 * @return a new time-capable {@link Scheduler}
 		 */
 		default TimedScheduler newTimer(ThreadFactory threadFactory) {
-			return new SingleTimedScheduler(threadFactory);
+			return new SingleScheduler(threadFactory);
 		}
 	}
 

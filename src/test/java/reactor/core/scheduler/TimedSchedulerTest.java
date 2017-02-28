@@ -27,17 +27,18 @@ import reactor.core.scheduler.Scheduler.Worker;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SingleTimedSchedulerTest extends AbstractSchedulerTest {
+public class TimedSchedulerTest extends AbstractSchedulerTest {
 
 	@Override
 	protected Scheduler scheduler() {
 		return Schedulers.timer();
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
-	public void unsupportedStart() throws Exception {
-		Schedulers.timer()
-		          .start();
+	@Test
+	public void supportedStart() throws Exception {
+		Scheduler scheduler = Schedulers.timer();
+		scheduler.start();
+		scheduler.dispose();
 	}
 
 	@Test(timeout = 10000)

@@ -23,19 +23,18 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import reactor.core.Cancellation;
 import reactor.core.Disposable;
 import reactor.core.Exceptions;
 import reactor.core.publisher.DirectProcessor;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -200,7 +199,6 @@ public class SchedulersTest {
 	}
 
 	@Test
-	@Ignore
 	public void testRejectingSingleTimedScheduler() {
 		assertRejectingScheduler(Schedulers.newTimer("test"));
 	}
@@ -281,14 +279,14 @@ public class SchedulersTest {
 	}
 
 	@Test
-	public void simpleTest() throws Exception {
+	public void immediateTaskIsExecuted() throws Exception {
 		Scheduler serviceRB = Schedulers.newSingle("rbWork");
 		Scheduler.Worker r = serviceRB.createWorker();
 
 		long start = System.currentTimeMillis();
-		CountDownLatch latch = new CountDownLatch(1);
+		AtomicInteger latch = new AtomicInteger(1);
 		Consumer<String> c =  ev -> {
-			latch.countDown();
+			latch.decrementAndGet();
 			try {
 				System.out.println("ev: "+ev);
 				Thread.sleep(1000);
@@ -299,13 +297,41 @@ public class SchedulersTest {
 		};
 		r.schedule(() -> c.accept("Hello World!"));
 
-		serviceRB.dispose();
 		Thread.sleep(1200);
 		long end = System.currentTimeMillis();
 
-		Assert.assertTrue("Event missed", latch.getCount() == 0);
-		Assert.assertTrue("Timeout too long", (end - start) >= 1000);
+		serviceRB.dispose();
 
+		Assert.assertTrue("Event missed", latch.intValue() == 0);
+		Assert.assertTrue("Timeout too long", (end - start) >= 1000);
+	}
+
+	@Test
+	public void immediateTaskIsSkippedIfDisposeRightAfter() throws Exception {
+		Scheduler serviceRB = Schedulers.newSingle("rbWork");
+		Scheduler.Worker r = serviceRB.createWorker();
+
+		long start = System.currentTimeMillis();
+		AtomicInteger latch = new AtomicInteger(1);
+		Consumer<String> c =  ev -> {
+			latch.decrementAndGet();
+			try {
+				System.out.println("ev: "+ev);
+				Thread.sleep(1000);
+			}
+			catch(InterruptedException ie){
+				throw Exceptions.propagate(ie);
+			}
+		};
+		r.schedule(() -> c.accept("Hello World!"));
+		serviceRB.dispose();
+
+		Thread.sleep(1200);
+		long end = System.currentTimeMillis();
+
+
+		Assert.assertTrue("Task not skipped", latch.intValue() == 1);
+		Assert.assertTrue("Timeout too long", (end - start) >= 1000);
 	}
 
 	@Test
