@@ -23,14 +23,14 @@ import org.junit.Assert;
 import org.junit.Test;
 import reactor.core.Cancellation;
 import reactor.core.Disposable;
-import reactor.core.scheduler.TimedScheduler.TimedWorker;
+import reactor.core.scheduler.Scheduler.Worker;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class SingleTimedSchedulerTest extends AbstractSchedulerTest {
 
 	@Override
-	protected TimedScheduler scheduler() {
+	protected Scheduler scheduler() {
 		return Schedulers.timer();
 	}
 
@@ -42,7 +42,7 @@ public class SingleTimedSchedulerTest extends AbstractSchedulerTest {
 
 	@Test(timeout = 10000)
 	final public void directScheduleAndDisposeDelay() throws Exception {
-		TimedScheduler s = scheduler();
+		Scheduler s = scheduler();
 
 		try {
 			assertThat(s.isDisposed()).isFalse();
@@ -84,9 +84,9 @@ public class SingleTimedSchedulerTest extends AbstractSchedulerTest {
 
 	@Test(timeout = 10000)
 	final public void workerScheduleAndDisposeDelay() throws Exception {
-		TimedScheduler s = scheduler();
+		Scheduler s = scheduler();
 		try {
-			TimedScheduler.TimedWorker w = s.createWorker();
+			Scheduler.Worker w = s.createWorker();
 
 			assertThat(w.isDisposed()).isFalse();
 			CountDownLatch latch = new CountDownLatch(1);
@@ -129,7 +129,7 @@ public class SingleTimedSchedulerTest extends AbstractSchedulerTest {
 
 	@Test(timeout = 10000)
 	final public void directScheduleAndDisposePeriod() throws Exception {
-		TimedScheduler s = scheduler();
+		Scheduler s = scheduler();
 
 		try {
 			assertThat(s.isDisposed()).isFalse();
@@ -172,9 +172,9 @@ public class SingleTimedSchedulerTest extends AbstractSchedulerTest {
 
 	@Test(timeout = 10000)
 	final public void workerScheduleAndDisposePeriod() throws Exception {
-		TimedScheduler s = scheduler();
+		Scheduler s = scheduler();
 		try {
-			TimedScheduler.TimedWorker w = s.createWorker();
+			Scheduler.Worker w = s.createWorker();
 
 			assertThat(w.isDisposed()).isFalse();
 			CountDownLatch latch = new CountDownLatch(1);
@@ -217,12 +217,12 @@ public class SingleTimedSchedulerTest extends AbstractSchedulerTest {
 
 	@Test
 	public void independentWorkers() throws InterruptedException {
-		TimedScheduler timer = Schedulers.newTimer("test-timer");
+		Scheduler timer = Schedulers.newTimer("test-timer");
         
         try {
-            TimedWorker w1 = timer.createWorker();
+            Worker w1 = timer.createWorker();
             
-            TimedWorker w2 = timer.createWorker();
+            Worker w2 = timer.createWorker();
             
             CountDownLatch cdl = new CountDownLatch(1);
             
@@ -248,10 +248,10 @@ public class SingleTimedSchedulerTest extends AbstractSchedulerTest {
 
     @Test
     public void massCancel() throws InterruptedException {
-        TimedScheduler timer = Schedulers.newTimer("test-timer");
+        Scheduler timer = Schedulers.newTimer("test-timer");
         
         try {
-            TimedWorker w1 = timer.createWorker();
+            Worker w1 = timer.createWorker();
     
             AtomicInteger counter = new AtomicInteger();
             

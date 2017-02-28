@@ -52,15 +52,6 @@ public abstract class AbstractSchedulerTest {
 		if(s instanceof Schedulers.CachedScheduler){
 			unwrapped = ((Schedulers.CachedScheduler)s).get();
 			assertThat(unwrapped).isNotNull();
-			if(!(s instanceof TimedScheduler)){
-				try{
-					((Schedulers.CachedScheduler)s).asTimedScheduler();
-					fail("cached as non timed-scheduler");
-				}
-				catch (UnsupportedOperationException e){
-					assertThat(e).hasMessage("Scheduler is not Timed");
-				}
-			}
 		}
 		else {
 			unwrapped = null;

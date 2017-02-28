@@ -65,11 +65,11 @@ final class ParallelScheduler implements Scheduler, Supplier<ExecutorService> {
 
     /**
      * Instantiates the default {@link ExecutorService} for the ParallelScheduler
-     * ({@code Executors.newSingleThreadExecutor}).
+     * ({@code Executors.newSingleThreadScheduledExecutor}).
      */
     @Override
     public ExecutorService get() {
-        return Executors.newSingleThreadExecutor(factory);
+        return Executors.newSingleThreadScheduledExecutor(factory);
     }
     
     void init(int n) {

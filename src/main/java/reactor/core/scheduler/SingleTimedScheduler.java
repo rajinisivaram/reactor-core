@@ -37,7 +37,8 @@ import static reactor.core.scheduler.ExecutorServiceScheduler.FINISHED;
  * A TimedScheduler with an embedded, single-threaded ScheduledExecutorService,
  * shared among all workers.
  */
-final class SingleTimedScheduler implements TimedScheduler {
+//FIXME incorporate into other base schedulers
+final class SingleTimedScheduler implements Scheduler, TimedScheduler {
 
 	static final AtomicLong COUNTER = new AtomicLong();
 
@@ -118,7 +119,7 @@ final class SingleTimedScheduler implements TimedScheduler {
 		return new SingleTimedSchedulerWorker(executor);
 	}
 
-	static final class SingleTimedSchedulerWorker implements TimedWorker {
+	static final class SingleTimedSchedulerWorker implements Worker, TimedWorker {
 
 		final ScheduledExecutorService executor;
 
