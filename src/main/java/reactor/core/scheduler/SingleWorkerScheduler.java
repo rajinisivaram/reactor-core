@@ -16,6 +16,7 @@
 package reactor.core.scheduler;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 
 import reactor.core.Cancellation;
 
@@ -47,7 +48,23 @@ final class SingleWorkerScheduler implements Scheduler, Executor {
     public Cancellation schedule(Runnable task) {
         return main.schedule(task);
     }
-    
+
+    @Override
+    public Cancellation schedule(Runnable task, long delay, TimeUnit unit) {
+        return main.schedule(task, delay, unit);
+    }
+
+    @Override
+    public Cancellation schedulePeriodically(Runnable task, long initialDelay,
+            long period, TimeUnit unit) {
+        return main.schedulePeriodically(task, initialDelay, period, unit);
+    }
+
+    @Override
+    public long now(TimeUnit unit) {
+        return main.now(unit);
+    }
+
     @Override
     public void execute(Runnable command) {
         main.schedule(command);
@@ -55,6 +72,7 @@ final class SingleWorkerScheduler implements Scheduler, Executor {
     
     @Override
     public Worker createWorker() {
+        //TODO could this be simplified by returning this.main?
         return new ExecutorScheduler.ExecutorSchedulerWorker(this);
     }
 
