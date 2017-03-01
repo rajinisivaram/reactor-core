@@ -30,6 +30,18 @@ public class ElasticSchedulerTest extends AbstractSchedulerTest {
 		return Schedulers.elastic();
 	}
 
+	@Override
+	protected boolean shouldTestDirectScheduleDelayPeriod() {
+		//TODO remove when elastic is time-capable
+		return false;
+	}
+
+	@Override
+	protected boolean shouldTestWorkerScheduleDelayPeriod() {
+		//TODO remove when elastic is time-capable
+		return false;
+	}
+
 	@Test(expected = UnsupportedOperationException.class)
 	public void unsupportedStart() {
 		Schedulers.elastic().start();

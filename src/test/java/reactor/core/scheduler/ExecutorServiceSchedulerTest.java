@@ -31,6 +31,18 @@ public class ExecutorServiceSchedulerTest extends AbstractSchedulerTest {
 	}
 
 	@Override
+	protected boolean shouldTestDirectScheduleDelayPeriod() {
+		//TODO remove when executorService is time-capable
+		return false;
+	}
+
+	@Override
+	protected boolean shouldTestWorkerScheduleDelayPeriod() {
+		//TODO remove when executorService is time-capable
+		return false;
+	}
+
+	@Override
 	protected boolean shouldCheckDisposeTask() {
 		return false;
 	}

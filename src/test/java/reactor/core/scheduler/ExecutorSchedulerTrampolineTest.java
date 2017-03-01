@@ -26,6 +26,16 @@ public class ExecutorSchedulerTrampolineTest extends AbstractSchedulerTest {
 	}
 
 	@Override
+	protected boolean shouldTestDirectScheduleDelayPeriod() {
+		return false;
+	}
+
+	@Override
+	protected boolean shouldTestWorkerScheduleDelayPeriod() {
+		return false;
+	}
+
+	@Override
 	protected Scheduler scheduler() {
 		return Schedulers.fromExecutor(Runnable::run, true);
 	}

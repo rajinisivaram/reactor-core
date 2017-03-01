@@ -27,6 +27,18 @@ public class ParallelSchedulerTest extends AbstractSchedulerTest {
 		return Schedulers.parallel();
 	}
 
+	@Override
+	protected boolean shouldTestDirectScheduleDelayPeriod() {
+		//TODO remove when parallel is time-capable
+		return false;
+	}
+
+	@Override
+	protected boolean shouldTestWorkerScheduleDelayPeriod() {
+		//TODO remove when parallel is time-capable
+		return false;
+	}
+
 	@Test(expected = IllegalArgumentException.class)
 	public void negativeParallelism() throws Exception {
 		Schedulers.newParallel("test", -1);

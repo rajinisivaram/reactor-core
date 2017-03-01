@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,20 +18,15 @@ package reactor.core.scheduler;
 /**
  * @author Stephane Maldini
  */
-public class SingleWorkerSchedulerTest extends AbstractSchedulerTest {
+public class SingleWorkerAroundTimerSchedulerTest extends AbstractSchedulerTest {
 
 	@Override
 	protected Scheduler scheduler() {
-		return Schedulers.single(Schedulers.immediate());
+		return Schedulers.single(Schedulers.newTimer("singleWorkerTimer"));
 	}
 
 	@Override
 	protected boolean shouldCheckDisposeTask() {
-		return false;
-	}
-
-	@Override
-	protected boolean shouldTestDirectScheduleDelayPeriod() {
 		return false;
 	}
 
