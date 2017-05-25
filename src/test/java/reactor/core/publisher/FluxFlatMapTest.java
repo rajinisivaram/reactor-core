@@ -1205,4 +1205,47 @@ public class FluxFlatMapTest {
 		assertThat(onNextSignals.get()).isEqualTo(10);
 	}
 
+    @Test
+    public void scanMain() {
+        Subscriber<Integer> actual = new LambdaSubscriber<>(null, e -> {}, null, null);
+        FluxFlatMap.FlatMapMain<Integer, Integer> test = new FluxFlatMap.FlatMapMain<>(actual,
+                i -> Mono.just(i), true, 5, QueueSupplier.<Integer>unbounded(), 789,  QueueSupplier.<Integer>get(789));
+        Subscription parent = Operators.emptySubscription();
+        test.onSubscribe(parent);
+
+        assertThat(test.scan(Scannable.ScannableAttr.ACTUAL)).isSameAs(actual);
+        assertThat(test.scan(Scannable.ScannableAttr.PARENT)).isSameAs(parent);
+        assertThat(test.scan(Scannable.BooleanAttr.DELAY_ERROR)).isTrue();
+        assertThat(test.scan(Scannable.LongAttr.REQUESTED_FROM_DOWNSTREAM)).isEqualTo(Long.MAX_VALUE);
+        assertThat(test.scan(Scannable.IntAttr.PREFETCH)).isEqualTo(5);
+        assertThat(test.scan(Scannable.IntAttr.BUFFERED)).isEqualTo(0);
+        assertThat(test.scan(Scannable.ThrowableAttr.ERROR)).isNull();
+        assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
+        assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isFalse();
+
+        test.onError(new IllegalStateException("boom"));
+        assertThat(test.scan(Scannable.ThrowableAttr.ERROR)).isSameAs(test.error);
+        assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isTrue();
+    }
+
+    @Test
+    public void scanInner() {
+        Subscriber<Integer> actual = new LambdaSubscriber<>(null, e -> {}, null, null);
+        FluxFlatMap.FlatMapMain<Integer, Integer> main = new FluxFlatMap.FlatMapMain<>(actual,
+                i -> Mono.just(i), true, 5, QueueSupplier.<Integer>unbounded(), 789,  QueueSupplier.<Integer>get(789));
+        FluxFlatMap.FlatMapInner<Integer> inner = new FluxFlatMap.FlatMapInner<>(main, 123);
+        Subscription parent = Operators.emptySubscription();
+        inner.onSubscribe(parent);
+
+        assertThat(inner.scan(Scannable.ScannableAttr.ACTUAL)).isSameAs(main);
+        assertThat(inner.scan(Scannable.ScannableAttr.PARENT)).isSameAs(parent);
+        assertThat(inner.scan(Scannable.IntAttr.PREFETCH)).isEqualTo(123);
+        assertThat(inner.scan(Scannable.IntAttr.BUFFERED)).isEqualTo(0);
+
+        assertThat(inner.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
+        assertThat(inner.scan(Scannable.BooleanAttr.TERMINATED)).isFalse();
+        inner.onError(new IllegalStateException("boom"));
+        assertThat(inner.scan(Scannable.BooleanAttr.TERMINATED)).isTrue();
+        assertThat(main.scan(Scannable.ThrowableAttr.ERROR)).hasMessage("boom");
+    }
 }

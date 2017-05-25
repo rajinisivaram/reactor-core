@@ -21,6 +21,10 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
+
+import reactor.core.Scannable;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.FluxOperatorTest;
 import reactor.test.subscriber.AssertSubscriber;
@@ -164,4 +168,24 @@ public class FluxMaterializeTest
 		                                                      .equals("test"))
 		            .verifyComplete();
 	}
+
+    @Test
+    public void scanSubscriber() {
+        Subscriber<Signal<String>> actual = new LambdaSubscriber<>(null, e -> {}, null, null);
+        FluxMaterialize.MaterializeSubscriber<String> test = new FluxMaterialize.MaterializeSubscriber<String>(actual);
+        Subscription parent = Operators.emptySubscription();
+        test.onSubscribe(parent);
+
+        assertThat(test.scan(Scannable.ScannableAttr.PARENT)).isSameAs(parent);
+        assertThat(test.scan(Scannable.ScannableAttr.ACTUAL)).isSameAs(actual);
+        assertThat(test.scan(Scannable.LongAttr.REQUESTED_FROM_DOWNSTREAM)).isEqualTo(Long.MAX_VALUE);
+        assertThat(test.scan(Scannable.IntAttr.BUFFERED)).isEqualTo(0);
+        assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
+
+        assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isFalse();
+        test.onError(new IllegalStateException("boom"));
+        // RS: TODO: Not sure how to set error
+        // assertThat(test.scan(Scannable.ThrowableAttr.ERROR)).hasMessage("boom");
+        assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isTrue();
+    }
 }

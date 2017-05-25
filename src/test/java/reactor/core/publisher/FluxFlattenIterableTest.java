@@ -16,6 +16,8 @@
 
 package reactor.core.publisher;
 
+import static org.assertj.core.api.Java6Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -25,7 +27,14 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.junit.Test;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
+
 import reactor.core.Fuseable;
+import reactor.core.Scannable;
+import reactor.core.Scannable.IntAttr;
+import reactor.core.Scannable.LongAttr;
+import reactor.core.Scannable.ScannableAttr;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.FluxOperatorTest;
 import reactor.test.subscriber.AssertSubscriber;
@@ -327,4 +336,59 @@ public class FluxFlattenIterableTest extends FluxOperatorTest<String, String> {
 				.verifyComplete();
 	}
 
+    @Test
+    public void scanOperator() {
+        Flux<Integer> source = Flux.range(1, 10);
+        FluxFlattenIterable<Integer, Integer> test = new FluxFlattenIterable<>(source, i -> new ArrayList<>(i), 35, QueueSupplier.one());
+
+        assertThat(test.scan(ScannableAttr.PARENT)).isSameAs(source);
+        assertThat(test.scan(IntAttr.PREFETCH)).isEqualTo(35);
+    }
+
+    @Test
+    public void scanSubscriber() {
+        Subscriber<Integer> actual = new LambdaSubscriber<>(null, e -> {}, null, null);
+        FluxFlattenIterable.FlattenIterableSubscriber<Integer, Integer> test =
+                new FluxFlattenIterable.FlattenIterableSubscriber<>(actual, i -> new ArrayList<>(i), 123, QueueSupplier.<Integer>one());
+        Subscription s = Operators.emptySubscription();
+        test.onSubscribe(s);
+
+        assertThat(test.scan(ScannableAttr.PARENT)).isSameAs(s);
+        assertThat(test.scan(ScannableAttr.ACTUAL)).isSameAs(actual);
+        assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isFalse();
+        assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
+        assertThat(test.scan(Scannable.ThrowableAttr.ERROR)).isNull();
+        assertThat(test.scan(IntAttr.PREFETCH)).isEqualTo(123);
+        assertThat(test.scan(LongAttr.REQUESTED_FROM_DOWNSTREAM)).isEqualTo(Long.MAX_VALUE);
+        assertThat(test.scan(IntAttr.BUFFERED)).isEqualTo(0);
+
+        assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isFalse();
+        test.onComplete();
+        assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isTrue();
+    }
+
+    @Test
+    public void scanSubscriberError() {
+        Subscriber<Integer> actual = new LambdaSubscriber<>(null, e -> {}, null, null);
+        FluxFlattenIterable.FlattenIterableSubscriber<Integer, Integer> test =
+                new FluxFlattenIterable.FlattenIterableSubscriber<>(actual, i -> new ArrayList<>(i), 123, QueueSupplier.<Integer>one());
+        Subscription s = Operators.emptySubscription();
+        test.onSubscribe(s);
+
+        assertThat(test.scan(Scannable.ThrowableAttr.ERROR)).isNull();
+        test.error = new IllegalStateException("boom");
+    }
+
+    @Test
+    public void scanSubscriberCancelled() {
+        Subscriber<Integer> actual = new LambdaSubscriber<>(null, e -> {}, null, null);
+        FluxFlattenIterable.FlattenIterableSubscriber<Integer, Integer> test =
+                new FluxFlattenIterable.FlattenIterableSubscriber<>(actual, i -> new ArrayList<>(i), 123, QueueSupplier.<Integer>one());
+        Subscription s = Operators.emptySubscription();
+        test.onSubscribe(s);
+
+        assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
+        test.cancel();
+        assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isTrue();
+    }
 }

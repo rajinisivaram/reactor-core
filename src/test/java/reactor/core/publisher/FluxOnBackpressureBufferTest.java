@@ -20,8 +20,12 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
+
 import reactor.core.Exceptions;
 import reactor.core.Fuseable;
+import reactor.core.Scannable;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.FluxOperatorTest;
 
@@ -142,4 +146,28 @@ public class FluxOnBackpressureBufferTest
 		            .expectNext(8, 9, 10, 11, 12, 13, 14, 15)
 		            .verifyComplete();
 	}
+
+	@Test
+    public void scanSubscriber() {
+        Subscriber<Integer> actual = new LambdaSubscriber<>(null, e -> {}, null, null);
+        FluxOnBackpressureBuffer.BackpressureBufferSubscriber<Integer> test =
+        		new FluxOnBackpressureBuffer.BackpressureBufferSubscriber<>(actual,
+        				123, false, false, t -> {});
+        Subscription parent = Operators.emptySubscription();
+        test.onSubscribe(parent);
+
+        assertThat(test.scan(Scannable.ScannableAttr.ACTUAL)).isSameAs(actual);
+        assertThat(test.scan(Scannable.ScannableAttr.PARENT)).isSameAs(parent);
+        assertThat(test.scan(Scannable.BooleanAttr.DELAY_ERROR)).isFalse();
+        assertThat(test.scan(Scannable.LongAttr.REQUESTED_FROM_DOWNSTREAM)).isEqualTo(Long.MAX_VALUE);
+        assertThat(test.scan(Scannable.IntAttr.PREFETCH)).isEqualTo(Integer.MAX_VALUE);
+        assertThat(test.scan(Scannable.IntAttr.BUFFERED)).isEqualTo(0);
+        assertThat(test.scan(Scannable.ThrowableAttr.ERROR)).isNull();
+        assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isFalse();
+        assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
+
+        test.onError(new IllegalStateException("boom"));
+        assertThat(test.scan(Scannable.ThrowableAttr.ERROR)).isSameAs(test.error);
+        assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isTrue();
+    }
 }

@@ -15,10 +15,16 @@
  */
 package reactor.core.publisher;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Arrays;
 
 import org.junit.Test;
 import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
+
+import reactor.core.Scannable;
 import reactor.test.subscriber.AssertSubscriber;
 
 public class FluxFirstEmittingTest {
@@ -136,4 +142,32 @@ public class FluxFirstEmittingTest {
 		  .assertError(NullPointerException.class);
 	}
 
+    @Test
+    public void scanSubscriber() {
+        Subscriber<String> actual = new LambdaSubscriber<>(null, e -> {}, null, null);
+        FluxFirstEmitting.RaceCoordinator<String> parent = new FluxFirstEmitting.RaceCoordinator<>(1);
+        FluxFirstEmitting.FirstEmittingSubscriber<String> test = new FluxFirstEmitting.FirstEmittingSubscriber<>(actual, parent, 1);
+        Subscription sub = Operators.emptySubscription();
+        test.onSubscribe(sub);
+
+        assertThat(test.scan(Scannable.ScannableAttr.PARENT)).isSameAs(sub);
+        assertThat(test.scan(Scannable.ScannableAttr.ACTUAL)).isSameAs(actual);
+        assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
+        // RS: TODO: How can cancelled be set?
+        // assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isTrue();
+    }
+
+    @Test
+    public void scanRaceCoordinator() {
+        Subscriber<String> actual = new LambdaSubscriber<>(null, e -> {}, null, null);
+        FluxFirstEmitting.RaceCoordinator<String> parent = new FluxFirstEmitting.RaceCoordinator<>(1);
+        FluxFirstEmitting.FirstEmittingSubscriber<String> test = new FluxFirstEmitting.FirstEmittingSubscriber<>(actual, parent, 1);
+        Subscription sub = Operators.emptySubscription();
+        test.onSubscribe(sub);
+
+        assertThat(parent.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
+        // RS: TODO: How can cancelled be set?
+        //parent.cancel();
+        //assertThat(parent.scan(Scannable.BooleanAttr.CANCELLED)).isTrue();
+    }
 }

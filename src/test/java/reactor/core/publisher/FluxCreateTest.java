@@ -21,7 +21,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -29,7 +28,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
 import reactor.core.Exceptions;
 import reactor.core.Scannable;
 import reactor.core.publisher.FluxCreate.BufferAsyncSink;
@@ -1113,8 +1111,7 @@ public class FluxCreateTest {
 		assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isFalse();
 		assertThat(test.scan(Scannable.ThrowableAttr.ERROR)).isNull();
 
-		test.error(new IllegalStateException("boom"));
-		assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isTrue();
+		test.error = new IllegalStateException("boom");
 		assertThat(test.scan(Scannable.ThrowableAttr.ERROR)).hasMessage("boom");
 
 	}
