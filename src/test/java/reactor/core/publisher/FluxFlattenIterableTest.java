@@ -355,40 +355,21 @@ public class FluxFlattenIterableTest extends FluxOperatorTest<String, String> {
 
         assertThat(test.scan(ScannableAttr.PARENT)).isSameAs(s);
         assertThat(test.scan(ScannableAttr.ACTUAL)).isSameAs(actual);
-        assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isFalse();
-        assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
-        assertThat(test.scan(Scannable.ThrowableAttr.ERROR)).isNull();
         assertThat(test.scan(IntAttr.PREFETCH)).isEqualTo(123);
-        assertThat(test.scan(LongAttr.REQUESTED_FROM_DOWNSTREAM)).isEqualTo(Long.MAX_VALUE);
-        assertThat(test.scan(IntAttr.BUFFERED)).isEqualTo(0);
-
-        assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isFalse();
-        test.onComplete();
-        assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isTrue();
-    }
-
-    @Test
-    public void scanSubscriberError() {
-        Subscriber<Integer> actual = new LambdaSubscriber<>(null, e -> {}, null, null);
-        FluxFlattenIterable.FlattenIterableSubscriber<Integer, Integer> test =
-                new FluxFlattenIterable.FlattenIterableSubscriber<>(actual, i -> new ArrayList<>(i), 123, QueueSupplier.<Integer>one());
-        Subscription s = Operators.emptySubscription();
-        test.onSubscribe(s);
+        test.requested = 35;
+        assertThat(test.scan(LongAttr.REQUESTED_FROM_DOWNSTREAM)).isEqualTo(35);
+        test.queue.add(5);
+        assertThat(test.scan(IntAttr.BUFFERED)).isEqualTo(1);
 
         assertThat(test.scan(Scannable.ThrowableAttr.ERROR)).isNull();
-        test.error = new IllegalStateException("boom");
-    }
-
-    @Test
-    public void scanSubscriberCancelled() {
-        Subscriber<Integer> actual = new LambdaSubscriber<>(null, e -> {}, null, null);
-        FluxFlattenIterable.FlattenIterableSubscriber<Integer, Integer> test =
-                new FluxFlattenIterable.FlattenIterableSubscriber<>(actual, i -> new ArrayList<>(i), 123, QueueSupplier.<Integer>one());
-        Subscription s = Operators.emptySubscription();
-        test.onSubscribe(s);
+        assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isFalse();
+        test.onError(new IllegalStateException("boom"));
+        assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isTrue();
+        assertThat(test.scan(Scannable.ThrowableAttr.ERROR)).hasMessage("boom");
 
         assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
         test.cancel();
         assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isTrue();
+
     }
 }

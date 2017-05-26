@@ -270,11 +270,17 @@ public class FluxJoinTest {
 		assertThat(test.scan(Scannable.ScannableAttr.ACTUAL)).isSameAs(actual);
 		test.request(123);
 		assertThat(test.scan(Scannable.LongAttr.REQUESTED_FROM_DOWNSTREAM)).isEqualTo(123);
-		assertThat(test.scan(Scannable.IntAttr.BUFFERED)).isEqualTo(0);
+		test.queue.add(1);
+		assertThat(test.scan(Scannable.IntAttr.BUFFERED)).isEqualTo(1);
+
 		assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isFalse();
-		assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
+		test.active = 0;
+		assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isTrue();
+
 		test.error = new IllegalStateException("boom");
 		assertThat(test.scan(Scannable.ThrowableAttr.ERROR)).isSameAs(test.error);
+
+		assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
 		test.cancel();
 		assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isTrue();
 	}

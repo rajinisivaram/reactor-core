@@ -140,12 +140,17 @@ public class FluxMapSignalTest extends FluxOperatorTest<String, String> {
 
         assertThat(test.scan(Scannable.ScannableAttr.PARENT)).isSameAs(parent);
         assertThat(test.scan(Scannable.ScannableAttr.ACTUAL)).isSameAs(actual);
-        assertThat(test.scan(Scannable.LongAttr.REQUESTED_FROM_DOWNSTREAM)).isEqualTo(Long.MAX_VALUE);
-        assertThat(test.scan(Scannable.IntAttr.BUFFERED)).isEqualTo(0);
-        assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
+        test.requested = 35;
+        assertThat(test.scan(Scannable.LongAttr.REQUESTED_FROM_DOWNSTREAM)).isEqualTo(35);
+        assertThat(test.scan(Scannable.IntAttr.BUFFERED)).isEqualTo(0); // RS: TODO non-zero size
 
         assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isFalse();
         test.onError(new IllegalStateException("boom"));
         assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isTrue();
+
+        assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
+        test.cancel();
+        assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isTrue();
+
     }
 }

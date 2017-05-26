@@ -153,8 +153,8 @@ public class FluxFirstEmittingTest {
         assertThat(test.scan(Scannable.ScannableAttr.PARENT)).isSameAs(sub);
         assertThat(test.scan(Scannable.ScannableAttr.ACTUAL)).isSameAs(actual);
         assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
-        // RS: TODO: How can cancelled be set?
-        // assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isTrue();
+        parent.cancelled = true;
+        assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isTrue();
     }
 
     @Test
@@ -165,9 +165,10 @@ public class FluxFirstEmittingTest {
         Subscription sub = Operators.emptySubscription();
         test.onSubscribe(sub);
 
+        assertThat(test.scan(Scannable.ScannableAttr.PARENT)).isSameAs(sub);
+        assertThat(test.scan(Scannable.ScannableAttr.ACTUAL)).isSameAs(actual);
         assertThat(parent.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
-        // RS: TODO: How can cancelled be set?
-        //parent.cancel();
-        //assertThat(parent.scan(Scannable.BooleanAttr.CANCELLED)).isTrue();
+        parent.cancelled = true;
+        assertThat(parent.scan(Scannable.BooleanAttr.CANCELLED)).isTrue();
     }
 }

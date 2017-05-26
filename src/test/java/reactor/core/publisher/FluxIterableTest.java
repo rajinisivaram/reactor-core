@@ -138,7 +138,11 @@ public class FluxIterableTest {
 		assertThat(test.scan(Scannable.ScannableAttr.ACTUAL)).isSameAs(actual);
 		test.request(123);
 		assertThat(test.scan(Scannable.LongAttr.REQUESTED_FROM_DOWNSTREAM)).isEqualTo(123);
+
 		assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isFalse();
+		test.clear();
+		assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isTrue();
+
 		assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
 		test.cancel();
 		assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isTrue();
@@ -153,7 +157,11 @@ public class FluxIterableTest {
 		assertThat(test.scan(Scannable.ScannableAttr.ACTUAL)).isSameAs(actual);
 		test.request(123);
 		assertThat(test.scan(Scannable.LongAttr.REQUESTED_FROM_DOWNSTREAM)).isEqualTo(123);
+
 		assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isFalse();
+		test.clear();
+		assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isTrue();
+
 		assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
 		test.cancel();
 		assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isTrue();

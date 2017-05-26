@@ -99,5 +99,6 @@ public class FluxJustTest {
 		assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
 		test.cancel();
 		assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isTrue();
+		assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isTrue();
 	}
 }

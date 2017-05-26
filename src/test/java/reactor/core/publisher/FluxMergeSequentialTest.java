@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -717,19 +718,21 @@ public class FluxMergeSequentialTest {
         Subscriber<Integer> actual = new LambdaSubscriber<>(null, e -> {}, null, null);
         FluxMergeSequential.MergeSequentialMain<Integer, Integer> test =
         		new FluxMergeSequential.MergeSequentialMain<Integer, Integer>(actual, i -> Mono.just(i),
-        				5, 123, ErrorMode.IMMEDIATE, QueueSupplier.<MergeSequentialInner<Integer>>unbounded());
+        				5, 123, ErrorMode.BOUNDARY, QueueSupplier.<MergeSequentialInner<Integer>>unbounded());
         Subscription parent = Operators.emptySubscription();
         test.onSubscribe(parent);
 
         assertThat(test.scan(Scannable.ScannableAttr.ACTUAL)).isSameAs(actual);
         assertThat(test.scan(Scannable.ScannableAttr.PARENT)).isSameAs(parent);
-        assertThat(test.scan(Scannable.BooleanAttr.DELAY_ERROR)).isFalse();
-        assertThat(test.scan(Scannable.LongAttr.REQUESTED_FROM_DOWNSTREAM)).isEqualTo(Long.MAX_VALUE);
+        assertThat(test.scan(Scannable.BooleanAttr.DELAY_ERROR)).isTrue();
+        test.requested = 35;
+        assertThat(test.scan(Scannable.LongAttr.REQUESTED_FROM_DOWNSTREAM)).isEqualTo(35);
         assertThat(test.scan(Scannable.IntAttr.PREFETCH)).isEqualTo(5);
-        assertThat(test.scan(Scannable.IntAttr.BUFFERED)).isEqualTo(0);
+        test.subscribers.add(new FluxMergeSequential.MergeSequentialInner<>(test, 123));
+        assertThat(test.scan(Scannable.IntAttr.BUFFERED)).isEqualTo(1);
+
         assertThat(test.scan(Scannable.ThrowableAttr.ERROR)).isNull();
         assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isFalse();
-
         test.onError(new IllegalStateException("boom"));
         assertThat(test.scan(Scannable.ThrowableAttr.ERROR)).isSameAs(test.error);
         assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isTrue();
@@ -749,10 +752,17 @@ public class FluxMergeSequentialTest {
         assertThat(inner.scan(Scannable.ScannableAttr.ACTUAL)).isSameAs(main);
         assertThat(inner.scan(Scannable.ScannableAttr.PARENT)).isSameAs(parent);
         assertThat(inner.scan(Scannable.IntAttr.PREFETCH)).isEqualTo(123);
-        assertThat(inner.scan(Scannable.IntAttr.BUFFERED)).isEqualTo(0);
+        inner.queue = new ConcurrentLinkedQueue<>();
+        inner.queue.add(1);
+        assertThat(inner.scan(Scannable.IntAttr.BUFFERED)).isEqualTo(1);
+
         assertThat(inner.scan(Scannable.ThrowableAttr.ERROR)).isNull();
-        assertThat(inner.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
         assertThat(inner.scan(Scannable.BooleanAttr.TERMINATED)).isFalse();
+        inner.queue.clear();
+        inner.setDone();
+        assertThat(inner.scan(Scannable.BooleanAttr.TERMINATED)).isTrue();
+
+        assertThat(inner.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
         inner.cancel();
         assertThat(inner.scan(Scannable.BooleanAttr.CANCELLED)).isTrue();
     }

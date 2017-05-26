@@ -434,9 +434,12 @@ public class FluxFilterWhenTest {
         assertThat(test.scan(Scannable.LongAttr.REQUESTED_FROM_DOWNSTREAM)).isEqualTo(1L);
 
         assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isFalse();
-        assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
         test.onNext(false);
         assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isTrue();
         assertThat(test.scan(Scannable.LongAttr.REQUESTED_FROM_DOWNSTREAM)).isEqualTo(0L);
+
+        assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
+        test.cancel();
+        assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isTrue();
     }
 }

@@ -379,22 +379,26 @@ public class FluxOnBackpressureBufferStrategyTest implements Consumer<String>,
         Subscriber<Integer> actual = new LambdaSubscriber<>(null, e -> {}, null, null);
         FluxOnBackpressureBufferStrategy.BackpressureBufferDropOldestSubscriber<Integer> test =
         		new FluxOnBackpressureBufferStrategy.BackpressureBufferDropOldestSubscriber<>(actual,
-        				123, false, t -> {}, BufferOverflowStrategy.DROP_OLDEST);
+        				123, true, t -> {}, BufferOverflowStrategy.DROP_OLDEST);
         Subscription parent = Operators.emptySubscription();
         test.onSubscribe(parent);
 
         assertThat(test.scan(Scannable.ScannableAttr.ACTUAL)).isSameAs(actual);
         assertThat(test.scan(Scannable.ScannableAttr.PARENT)).isSameAs(parent);
-        assertThat(test.scan(Scannable.BooleanAttr.DELAY_ERROR)).isFalse();
-        assertThat(test.scan(Scannable.LongAttr.REQUESTED_FROM_DOWNSTREAM)).isEqualTo(Long.MAX_VALUE);
+        assertThat(test.scan(Scannable.BooleanAttr.DELAY_ERROR)).isTrue();
+        test.requested = 35;
+        assertThat(test.scan(Scannable.LongAttr.REQUESTED_FROM_DOWNSTREAM)).isEqualTo(35);
         assertThat(test.scan(Scannable.IntAttr.PREFETCH)).isEqualTo(Integer.MAX_VALUE);
-        assertThat(test.scan(Scannable.IntAttr.BUFFERED)).isEqualTo(0);
+        assertThat(test.scan(Scannable.IntAttr.BUFFERED)).isEqualTo(0); // RS: TODO non-zero size
+
         assertThat(test.scan(Scannable.ThrowableAttr.ERROR)).isNull();
         assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isFalse();
-        assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
-
         test.onError(new IllegalStateException("boom"));
         assertThat(test.scan(Scannable.ThrowableAttr.ERROR)).isSameAs(test.error);
         assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isTrue();
+
+        assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
+        test.cancel();
+        assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isTrue();
     }
 }
