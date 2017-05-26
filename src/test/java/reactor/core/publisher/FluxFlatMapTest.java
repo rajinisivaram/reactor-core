@@ -19,6 +19,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -1219,6 +1220,8 @@ public class FluxFlatMapTest {
         test.requested = 35;
         assertThat(test.scan(Scannable.LongAttr.REQUESTED_FROM_DOWNSTREAM)).isEqualTo(35);
         assertThat(test.scan(Scannable.IntAttr.PREFETCH)).isEqualTo(5);
+
+        test.scalarQueue = new ConcurrentLinkedQueue<>();
         test.scalarQueue.add(1);
         assertThat(test.scan(Scannable.IntAttr.BUFFERED)).isEqualTo(1);
         assertThat(test.scan(Scannable.ThrowableAttr.ERROR)).isNull();
@@ -1226,6 +1229,7 @@ public class FluxFlatMapTest {
         assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isFalse();
         test.onError(new IllegalStateException("boom"));
         assertThat(test.scan(Scannable.ThrowableAttr.ERROR)).isSameAs(test.error);
+        test.scalarQueue.clear();
         assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isTrue();
 
         assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
@@ -1245,13 +1249,15 @@ public class FluxFlatMapTest {
         assertThat(inner.scan(Scannable.ScannableAttr.ACTUAL)).isSameAs(main);
         assertThat(inner.scan(Scannable.ScannableAttr.PARENT)).isSameAs(parent);
         assertThat(inner.scan(Scannable.IntAttr.PREFETCH)).isEqualTo(123);
+        inner.queue = new ConcurrentLinkedQueue<>();
         inner.queue.add(5);
         assertThat(inner.scan(Scannable.IntAttr.BUFFERED)).isEqualTo(1);
 
         assertThat(inner.scan(Scannable.BooleanAttr.TERMINATED)).isFalse();
         inner.onError(new IllegalStateException("boom"));
-        assertThat(inner.scan(Scannable.BooleanAttr.TERMINATED)).isTrue();
         assertThat(main.scan(Scannable.ThrowableAttr.ERROR)).hasMessage("boom");
+        inner.queue.clear();
+        assertThat(inner.scan(Scannable.BooleanAttr.TERMINATED)).isTrue();
 
         assertThat(inner.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
         inner.cancel();

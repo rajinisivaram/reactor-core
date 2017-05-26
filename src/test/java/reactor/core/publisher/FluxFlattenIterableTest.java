@@ -363,9 +363,10 @@ public class FluxFlattenIterableTest extends FluxOperatorTest<String, String> {
 
         assertThat(test.scan(Scannable.ThrowableAttr.ERROR)).isNull();
         assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isFalse();
-        test.onError(new IllegalStateException("boom"));
-        assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isTrue();
+        test.error = new IllegalStateException("boom");
         assertThat(test.scan(Scannable.ThrowableAttr.ERROR)).hasMessage("boom");
+        test.onComplete();
+        assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isTrue();
 
         assertThat(test.scan(Scannable.BooleanAttr.CANCELLED)).isFalse();
         test.cancel();

@@ -255,8 +255,6 @@ public class FluxJoinTest {
 		  .assertNoValues();
 	}
 
-
-
 	@Test
 	public void scanSubscription() {
 		Subscriber<String> actual = new LambdaSubscriber<>(null, e -> {}, null, sub -> sub.request(100));
@@ -271,6 +269,7 @@ public class FluxJoinTest {
 		test.request(123);
 		assertThat(test.scan(Scannable.LongAttr.REQUESTED_FROM_DOWNSTREAM)).isEqualTo(123);
 		test.queue.add(1);
+		test.queue.add(5);
 		assertThat(test.scan(Scannable.IntAttr.BUFFERED)).isEqualTo(1);
 
 		assertThat(test.scan(Scannable.BooleanAttr.TERMINATED)).isFalse();
